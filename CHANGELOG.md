@@ -2,6 +2,13 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.0.1-beta.1 (2026-11-23)
+
+### Fixed
+
+- Switching on a HEOS CLI device with nothing to resume: the plugin now checks that the HEOS favorite / Quick Select slot actually starts playing and tries a second time if not (log: `… did not start, trying again.`). A Denon Home Amp that had been idle for several days confirmed the first start but stayed silent, and the Home app tile jumped back to *Off*. If it doesn't start at all, the log says so and the tile shows *Off*.
+- The log message for *next* / *previous track* on a radio station or input no longer repeats the device name.
+
 ## 2.0.0 (2026-11-23)
 
 Combines 2.0.0-beta.1 and 2.0.0-beta.2.

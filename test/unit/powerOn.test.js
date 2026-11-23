@@ -91,23 +91,23 @@ describe("HEOS power on", () => {
   });
 
   it("starts the favorite if there is no source (state unknown)", async () => {
-    device({ states: ["unknown"] });
+    device({ states: ["unknown", "play"] });
     powerUpdates.length = 0;
     assert.equal(await client.setPower(true), true);
-    assert.deepEqual(commands(), ["player/get_play_state", "browse/play_preset"]);
+    assert.deepEqual(commands(), ["player/get_play_state", "browse/play_preset", "player/get_play_state"]);
     assert.deepEqual(infos, ["Nothing to resume, starting HEOS favorite 1."]);
     assert.deepEqual(powerUpdates, [true]);
   });
 
   it("starts the favorite if the current media is empty (Denon Home Amp after a streaming session)", async () => {
-    device({ states: ["pause"], media: EMPTY });
+    device({ states: ["pause", "play"], media: EMPTY });
     assert.equal(await client.setPower(true), true);
-    assert.deepEqual(commands(), ["player/get_play_state", "player/get_now_playing_media", "browse/play_preset"]);
+    assert.deepEqual(commands(), ["player/get_play_state", "player/get_now_playing_media", "browse/play_preset", "player/get_play_state"]);
     assert.deepEqual(infos, ["Nothing to resume (no current media), starting HEOS favorite 1."]);
   });
 
   it("starts the favorite if play is accepted but playback doesn't start", async () => {
-    device({ states: ["pause"] }); // stays paused
+    device({ states: [...Array(9).fill("pause"), "play"] }); // stays paused until the favorite plays
     assert.equal(await client.setPower(true), true);
     assert.deepEqual(commands(), [
       "player/get_play_state",
@@ -116,15 +116,16 @@ describe("HEOS power on", () => {
       // waits up to 8 s (radio streams need time to buffer)
       ...Array(8).fill("player/get_play_state"),
       "browse/play_preset",
+      "player/get_play_state",
     ]);
     assert.deepEqual(infos, ["Playback did not start, starting HEOS favorite 1."]);
   });
 
   it("starts the configured favorite if the speaker refuses to play", async () => {
     client.setPowerOnFavorite(3, (message) => infos.push(message));
-    device({ states: ["stop"], setPlay: "fail" });
+    device({ states: ["stop", "play"], setPlay: "fail" });
     assert.equal(await client.setPower(true), true);
-    assert.equal(written.at(-1), `browse/play_preset?pid=${PID}&preset=3`);
+    assert.equal(written.filter((c) => c.startsWith("browse/play_preset")).at(-1), `browse/play_preset?pid=${PID}&preset=3`);
     assert.deepEqual(infos, ["The speaker refused to resume playback, starting HEOS favorite 3."]);
   });
 
@@ -137,6 +138,27 @@ describe("HEOS power on", () => {
     device({ states: ["stop"], setPlay: "fail" });
     await assert.rejects(client.setPower(true), CommandFailedException);
     assert.ok(!commands().includes("browse/play_preset"));
+  });
+
+  it("starts the favorite a second time if it doesn't play (device idle for days, seen on a Denon Home Amp)", async () => {
+    // unknown → favorite → 8 checks without playback → favorite again → plays
+    device({ states: ["unknown", ...Array(8).fill("unknown"), "play"] });
+    assert.equal(await client.setPower(true), true);
+    assert.equal(commands().filter((c) => c === "browse/play_preset").length, 2);
+    assert.deepEqual(infos, ["Nothing to resume, starting HEOS favorite 1.", "HEOS favorite 1 did not start, trying again."]);
+  });
+
+  it("reports power off if the favorite doesn't start at all", async () => {
+    device({ states: ["unknown"] }); // never plays
+    powerUpdates.length = 0;
+    assert.equal(await client.setPower(true), false);
+    assert.equal(commands().filter((c) => c === "browse/play_preset").length, 2);
+    assert.deepEqual(infos, [
+      "Nothing to resume, starting HEOS favorite 1.",
+      "HEOS favorite 1 did not start, trying again.",
+      "HEOS favorite 1 did not start. Check that it plays in the HEOS app.",
+    ]);
+    assert.deepEqual(powerUpdates, [false]);
   });
 
   it("switching off still sends stop", async () => {
@@ -155,15 +177,18 @@ describe("HEOS power on with Quick Select", () => {
     client.player_id = PID;
     client.setPowerOnFavorite(1, (message) => infos.push(message));
     client.setPowerOnQuickSelect(2);
+    client.playVerifyIntervalMs = 5;
+    let playStateQueries = 0;
     const written = [];
     client.socket = {
       write: (data) => {
         const command = data.replace("heos://", "").replace("\r\n", "");
         written.push(command);
         const [name] = command.split("?");
+        const state = name === "player/get_play_state" && (playStateQueries++ === 0 ? "unknown" : "play");
         const reply =
           name === "player/get_play_state"
-            ? { heos: { command: name, result: "success", message: `pid=${PID}&state=unknown` } }
+            ? { heos: { command: name, result: "success", message: `pid=${PID}&state=${state}` } }
             : { heos: { command: name, result: "success", message: `pid=${PID}&id=${command.match(/id=(\d+)/)?.[1]}` } };
         setImmediate(() => client.dataHandler(Buffer.from(heos(reply))));
         return true;
@@ -171,7 +196,7 @@ describe("HEOS power on with Quick Select", () => {
       destroy() {},
     };
     assert.equal(await client.setPower(true), true);
-    assert.equal(written.at(-1), `player/play_quickselect?pid=${PID}&id=2`);
+    assert.ok(written.includes(`player/play_quickselect?pid=${PID}&id=2`));
     assert.deepEqual(infos, ["Nothing to resume, starting Quick Select 2."]);
     client.socket = undefined;
   });

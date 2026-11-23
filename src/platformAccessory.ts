@@ -619,7 +619,7 @@ export class DenonAudioAccessory {
     } catch (error) {
       if (error instanceof CommandFailedException) {
         // the device refuses skipping for sources without tracks (radio stations, inputs) - not an error of the plugin
-        this.log.info(`${this.name}: the current source doesn't support skipping to the next track (e.g. a radio station or an input).`);
+        this.log.info(`The current source doesn't support skipping to the next track (e.g. a radio station or an input).`);
         return;
       }
       this.log.error(`An error occured while setting play next for ${this.name}.`, error);
@@ -634,7 +634,7 @@ export class DenonAudioAccessory {
     } catch (error) {
       if (error instanceof CommandFailedException) {
         // the device refuses skipping for sources without tracks (radio stations, inputs) - not an error of the plugin
-        this.log.info(`${this.name}: the current source doesn't support skipping to the previous track (e.g. a radio station or an input).`);
+        this.log.info(`The current source doesn't support skipping to the previous track (e.g. a radio station or an input).`);
         return;
       }
       this.log.error(`An error occured while setting play previous for ${this.name}.`, error);

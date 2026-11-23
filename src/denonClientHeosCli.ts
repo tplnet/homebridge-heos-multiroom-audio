@@ -615,11 +615,11 @@ export class DenonClientHeosCli extends DenonClient {
     if (fallback) {
       if (rawState === DenonClientHeosCli.PROTOCOL.PLAY_STATE.VALUES.UNKNOWN.VALUE) {
         this.infoLog(`Nothing to resume, starting ${fallback.label}.`);
-        return fallback.start();
+        return this.startFallback(fallback);
       }
       if (await this.hasNoMedia()) {
         this.infoLog(`Nothing to resume (no current media), starting ${fallback.label}.`);
-        return fallback.start();
+        return this.startFallback(fallback);
       }
     }
 
@@ -630,7 +630,7 @@ export class DenonClientHeosCli extends DenonClient {
         throw error;
       }
       this.infoLog(`The speaker refused to resume playback, starting ${fallback.label}.`);
-      return fallback.start();
+      return this.startFallback(fallback);
     }
 
     if (!fallback) {
@@ -638,14 +638,41 @@ export class DenonClientHeosCli extends DenonClient {
     }
 
     // Some devices accept "play" without having anything to play (they stay paused), so check that playback started.
+    if (await this.waitForPlayback()) {
+      return true;
+    }
+    this.infoLog(`Playback did not start, starting ${fallback.label}.`);
+    return this.startFallback(fallback);
+  }
+
+  /** True as soon as the device reports "play", false if it doesn't within PLAY_VERIFY_CHECKS intervals. */
+  private async waitForPlayback(): Promise<boolean> {
+    const PLAY = DenonClientHeosCli.PROTOCOL.PLAY_STATE.VALUES.PLAY.VALUE;
     for (let check = 0; check < DenonClientHeosCli.PLAY_VERIFY_CHECKS; check++) {
       await new Promise((resolve) => setTimeout(resolve, this.playVerifyIntervalMs));
       if ((await this.sendCommand(DenonClientHeosCli.PROTOCOL.PLAY_STATE, CommandMode.GET, {})) === PLAY) {
         return true;
       }
     }
-    this.infoLog(`Playback did not start, starting ${fallback.label}.`);
-    return fallback.start();
+    return false;
+  }
+
+  /**
+   * Starts the favorite / Quick Select slot and checks that it plays. A device that was idle for days sometimes
+   * confirms the command but doesn't start (seen on a Denon Home Amp), so it is tried a second time.
+   */
+  private async startFallback(fallback: { label: string; start: () => Promise<boolean> }): Promise<boolean> {
+    await fallback.start();
+    if (await this.waitForPlayback()) {
+      return true;
+    }
+    this.infoLog(`${fallback.label} did not start, trying again.`);
+    await fallback.start();
+    if (await this.waitForPlayback()) {
+      return true;
+    }
+    this.infoLog(`${fallback.label} did not start. Check that it plays in the HEOS app.`);
+    return false;
   }
 
   /**

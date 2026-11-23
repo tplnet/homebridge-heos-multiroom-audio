@@ -63,19 +63,20 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 | Switch on resumes a radio station that needs a few seconds to buffer (no favorite) | ✅ | ✅ | ☐ | – |
 | Tile doesn't jump back after switching on / off (1.2.2) | ✅ | ✅ | ☐ | ✅ |
 | Power on / off from the Home app | ✅ (Office, Kids Room; resumes Spotify) | ✅ | ☐ | ✅ |
-| Power state updates when changed on the device / in the HEOS app | ✅ (pause shows *Off*) | ✅ | ☐ | ✅ |
+| Power state updates when changed on the device / in the HEOS app | ✅ (pause shows *Off*) | ✅ | ✅ | ✅ |
 | Volume changed on the device / in the HEOS app is shown in apps that show all accessory settings (Eve, Controller for HomeKit; the Home app has no volume slider) | ☐ | ☐ | ☐ | ☐ |
-| Remote: volume buttons (`volumeStepSize`) | ✅ | ✅ | ☐ | ✅ |
+| Remote: volume buttons (`volumeStepSize`) | ✅ | ✅ | ✅ | ✅ |
 | One tile per device in the Home app, volume via the Control Center remote (1.2.5) | ✅ | ☐ | ☐ | ☐ |
 | Volume limit: 100 % in Home = limit on device | ✅ | ☐ | ☐ | ☐ |
 | Volume limit 0 keeps the device silent | ☐ | ☐ | ☐ | ☐ |
-| Mute / unmute | ✅ | ✅ | ☐ | ✅ |
+| Mute / unmute | ✅ | ✅ | ✅ | ✅ |
 | Switch input from the Home app | – | – | ☐ | ✅ |
 | Input changed on the receiver shows up in Home (Hybrid, 1.5.1-beta.7) | – | – | ☐ | ✅ (1.5.1-beta.7) |
 | Input changed in the HEOS app shows up in Home | – | – | ☐ | ✅ (1.5.1-beta.8) |
-| Streaming source (Spotify / AirPlay) is shown as current input | ☐ | ☐ | ☐ | ✅ (1.5.1-beta.8) |
-| Remote: play / pause | ✅ | ✅ | ☐ | ✅ |
-| Remote: next / previous track (radio / input: info in the log, 1.5.1-beta.7) | ✅ | ✅ | ☐ | ✅ |
+| Streaming source (Spotify / AirPlay) is shown as current input | ☐ | ☐ | ✅ (2.0.0) | ✅ (1.5.1-beta.8) |
+| Remote: play / pause | ✅ | ✅ | ✅ | ✅ |
+| Remote: next / previous track (radio / input: info in the log, 1.5.1-beta.7) | ✅ | ✅ | ✅ | ✅ |
+| Switch on after the device was idle for days: favorite starts with the first press (2.0.1-beta.1: checked and retried once) | ☐ | ☐ | ☐ (2.0.0: first start failed silently, second worked) | – |
 
 Results without a version were checked with 1.5.1-beta.5 (Homebridge 2.5.0). The Home 150 / 250 have only AUX In, so switching inputs is not tested there.
 
