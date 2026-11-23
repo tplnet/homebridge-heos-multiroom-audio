@@ -79,6 +79,7 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 | Hybrid: switching off = real standby, switching on wakes the device (Home Amp, 2.0.1-beta.1) | – | – | ✅ | ✅ |
 | Hybrid: switching on continues the last music source (radio), or starts the favorite if it can't be resumed (ended Spotify session) (2.0.1-beta.2) | – | – | ✅ | ☐ |
 | Hybrid: starting music in the HEOS app wakes the device from standby, the tile switches to *On* (2.0.1-beta.2) | – | – | ✅ | ☐ |
+| Hybrid: the device's automatic standby after a pause switches the tile to *Off* (Home Amp: within an hour) (2.0.1-beta.2) | – | – | ✅ | ☐ |
 | Hybrid: the tile stays *On* while paused (automations bound to the tile keep running) (2.0.1-beta.2) | – | – | ✅ | ☐ |
 | Switch on after the device was idle for days: favorite starts with the first press (2.0.1-beta.1: checked and retried once) | ☐ | ☐ | ☐ (2.0.0: first start failed silently, second worked) | – |
 
