@@ -119,7 +119,7 @@ fs.writeFileSync(
   path.join(storage, "config.json"),
   JSON.stringify({
     bridge: { name: "Smoke", username: "0E:AA:BB:CC:DD:EE", port: 51899, pin: "031-45-154" },
-    platforms: [{ platform: "DenonHeosAudio", deviceDiscovery: false, devices }],
+    platforms: [{ platform: "HeosMultiroomAudio", deviceDiscovery: false, devices }],
   }),
 );
 

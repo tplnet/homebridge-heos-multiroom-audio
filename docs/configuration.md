@@ -96,7 +96,7 @@ Use the settings form in the Homebridge UI, or edit `config.json`:
 
 ```json
 {
-  "platform": "DenonHeosAudio",
+  "platform": "HeosMultiroomAudio",
   "deviceDiscovery": true,
   "autoAddDiscoveredDevices": true,
   "excludedSerialNumbers": ["BLT01234567890"],
@@ -199,11 +199,23 @@ The Homebridge UI shows the German form when its language is set to **Deutsch** 
 
 New features and fixes are published as a **beta** first (e.g. `1.5.0-beta.1`) and become a regular version after they have been tested. Betas are not offered to users of the regular version. To try one: Homebridge UI → *Plugins* → ⋮ on this plugin → *Manage Version* → choose the beta, or run `npm install @tplnet/homebridge-heos-multiroom-audio@beta` in the Homebridge storage directory. While you run a beta, the Homebridge UI offers newer betas and later the regular version as updates. Betas can contain errors – please report them as an [issue](https://github.com/tplnet/homebridge-heos-multiroom-audio/issues).
 
+## Platform name
+
+Since version 2.0.0 the platform name in `config.json` is **`HeosMultiroomAudio`**. Up to version 1.x it was `DenonHeosAudio` (the name of the original plugin).
+
+A configuration with the old name keeps working: the plugin starts and logs a warning. The settings form of the Homebridge UI only shows the configuration under the new name, so change it once:
+
+1. Homebridge UI → *Plugins* → ⋮ on this plugin → *JSON Config*.
+2. Change `"platform": "DenonHeosAudio"` to `"platform": "HeosMultiroomAudio"` and save.
+3. Restart the plugin's child bridge (or Homebridge).
+
+All other settings, the child bridge, the ports and the pairing in Apple Home stay the same.
+
 ## Switching from another package
 
 ### Switching from @tplnet/homebridge-denon-heos-audio
 
-This plugin was renamed from `@tplnet/homebridge-denon-heos-audio` to `@tplnet/homebridge-heos-multiroom-audio` (version 1.5.0). The platform name `DenonHeosAudio` and your configuration stay the same, and the devices keep their pairing in Apple Home. The two packages must not be installed at the same time:
+This plugin was renamed from `@tplnet/homebridge-denon-heos-audio` to `@tplnet/homebridge-heos-multiroom-audio` (version 1.5.0). Your configuration stays the same (from version 2.0.0, change the platform name once – see [Platform name](#platform-name)), and the devices keep their pairing in Apple Home. The two packages must not be installed at the same time:
 
 1. Remove the old package **in the terminal**, in the Homebridge storage directory (removing it in the UI may also delete its configuration):
 
@@ -215,7 +227,7 @@ This plugin was renamed from `@tplnet/homebridge-denon-heos-audio` to `@tplnet/h
 
 ### Switching from the original plugin
 
-The original plugin is called `homebridge-denon-heos-audio` (without `@tplnet/`). Both use the platform name `DenonHeosAudio`, so your existing configuration keeps working, but they must not be installed at the same time:
+The original plugin is called `homebridge-denon-heos-audio` (without `@tplnet/`). Its platform name `DenonHeosAudio` is still accepted by this plugin, so your existing configuration keeps working (change it to `HeosMultiroomAudio` once – see [Platform name](#platform-name)). The two plugins must not be installed at the same time:
 
 1. Remove the original **in the terminal** (removing it in the UI may also delete its configuration):
 

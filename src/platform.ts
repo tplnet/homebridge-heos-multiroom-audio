@@ -10,7 +10,7 @@ import type {
 
 import { DenonAudioAccessory as DenonAudioAccessory } from "./platformAccessory.js";
 import * as CustomLogging from "./customLogging.js";
-import { PLATFORM_NAME, PLUGIN_NAME } from "./settings.js";
+import { LEGACY_PLATFORM_NAME, PLATFORM_NAME, PLUGIN_NAME } from "./settings.js";
 import * as DenonProtocol from "./denonProtocol.js";
 import type { DeviceConfig } from "./config.js";
 import { buildDiscoveredDeviceConfig } from "./discovery.js";
@@ -26,6 +26,11 @@ const OVERVIEW_UPDATE_DELAY_MS = 10 * 1000;
 const INITIAL_DISCOVERY_WINDOW_MS = 10 * 1000;
 
 export class DenonAudioPlatform implements DynamicPlatformPlugin {
+  /** Platform name this instance was registered with (see LegacyDenonAudioPlatform). */
+  protected get platformName(): string {
+    return PLATFORM_NAME;
+  }
+
   public readonly rawLog: Logger;
   public readonly log: Logger;
   public readonly config: PlatformConfig;
@@ -132,7 +137,7 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
     if (cached.length === 0) {
       return;
     }
-    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, cached);
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, this.platformName, cached);
     this.accessories.clear();
     this.log.info(
       `Removed ${cached.length} accessor${cached.length === 1 ? "y" : "ies"} of an older plugin version from the Homebridge cache (${cached.map((a) => a.displayName).join(", ")}). The devices are published again as TV accessories.`,
@@ -552,5 +557,22 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
       // a device found later (e.g. switched on hours after the start): log the updated overview
       this.scheduleOverview(OVERVIEW_UPDATE_DELAY_MS);
     }
+  }
+}
+
+/**
+ * The platform under its name of version 1.x ("DenonHeosAudio"). Works like DenonAudioPlatform,
+ * but asks the user to switch to the new name.
+ */
+export class LegacyDenonAudioPlatform extends DenonAudioPlatform {
+  protected override get platformName(): string {
+    return LEGACY_PLATFORM_NAME;
+  }
+
+  constructor(log: Logger, config: PlatformConfig, api: API) {
+    super(log, config, api);
+    this.log.warn(
+      `The platform name "${LEGACY_PLATFORM_NAME}" in config.json is outdated. Change "platform": "${LEGACY_PLATFORM_NAME}" to "platform": "${PLATFORM_NAME}" (Homebridge UI → Plugins → ⋮ on this plugin → JSON Config), then restart. Until then the plugin settings form doesn't show this configuration. Everything else keeps working, also the pairing in the Home app.`,
+    );
   }
 }
