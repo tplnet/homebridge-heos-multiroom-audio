@@ -67,6 +67,7 @@ Not sure what your device supports? Turn on device discovery: the log lists ever
 - Homebridge 1.8 or newer (2.x supported, tested with Homebridge 2.5)
 - Node.js 22.12+, 24 or 26
 - Denon or Marantz devices with HEOS and/or AVR Control in the same network as Homebridge (no VLAN or guest network separation)
+- *AVR Control* and *Hybrid* keep a permanent connection to the receiver on port 23. Many Denon and Marantz receivers accept only one such connection at a time, so Home Assistant or another plugin that also uses AVR Control can be locked out – see [Troubleshooting](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/troubleshooting.md#another-app-cant-connect-to-the-receiver-port-23).
 
 ## Installation
 

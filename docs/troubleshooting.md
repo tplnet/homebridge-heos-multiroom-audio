@@ -20,6 +20,10 @@ Switching on starts playback. If the speaker has nothing to resume, the plugin s
 **The Marantz receiver doesn't react to AVR Control commands.**
 Enable *Network Control* (sometimes called *IP Control*) in the receiver's network settings so it stays reachable in standby.
 
+<a id="another-app-cant-connect-to-the-receiver-port-23"></a>
+**Another app can't connect to the receiver (port 23), e.g. Home Assistant or a second plugin.**
+With *AVR Control* or *Hybrid* the plugin keeps a permanent connection to the receiver on port 23 (Telnet), so it learns about changes right away. Many Denon and Marantz receivers accept only one such connection at a time, so a second app that also uses AVR Control is locked out (or locks out the plugin). Options: let only one app use AVR Control; or set the receiver's *Control Protocol* to *HEOS CLI* in this plugin – HEOS accepts several connections, but switching off then only stops the playback instead of putting the receiver into standby.
+
 **The device can't be added in the Home app.**
 See [The device does not appear in step 4?](apple-home.md#adding-a-device-step-by-step)
 

@@ -117,16 +117,35 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
    * It should be used to set up event handlers for characteristics and update respective values.
    */
   configureAccessory(accessory: PlatformAccessory) {
-    this.log.info("Loading accessory from cache:", accessory.displayName);
+    this.log.debug("Loading accessory from cache:", accessory.displayName);
 
     // add the restored accessory to the accessories cache, so we can track if it has already been registered
     this.accessories.set(accessory.UUID, accessory);
   }
 
-  discoverDevices() {
-    let existingAccessoriesUuids = Array.from(this.accessories.keys());
+  /**
+   * Removes the accessories restored from the Homebridge cache. They come from an older version
+   * that published the devices on the bridge; today every device is an external accessory.
+   */
+  private removeCachedAccessories() {
+    const cached = Array.from(this.accessories.values());
+    if (cached.length === 0) {
+      return;
+    }
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, cached);
+    this.accessories.clear();
+    this.log.info(
+      `Removed ${cached.length} accessor${cached.length === 1 ? "y" : "ies"} of an older plugin version from the Homebridge cache (${cached.map((a) => a.displayName).join(", ")}). The devices are published again as TV accessories.`,
+    );
+  }
 
-    // loop over the configured devices and register each one if it has not already been registered
+  discoverDevices() {
+    // The devices are TV accessories, published as external accessories, which Homebridge doesn't cache.
+    // Accessories in the cache come from an older version that published them on the bridge: remove them,
+    // every device is published fresh below.
+    this.removeCachedAccessories();
+
+    // loop over the configured devices and publish each one
     if (this.config.devices) {
       for (const deviceConfig of this.config.devices as DeviceConfig[]) {
         if (this.activeSerialNumbers.has(deviceConfig.serialNumber)) {
@@ -138,61 +157,14 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
         this.activeSerialNumbers.add(deviceConfig.serialNumber);
         this.deviceOverview.addManual(deviceConfig);
 
-        // generate a unique id for the accessory this should be generated from something globally unique, but constant, for example, the device serial number
-        // or MAC address
+        // the UUID is derived from the serial number, so the Home app pairing stays the same
         const uuid = this.api.hap.uuid.generate(deviceConfig.serialNumber);
-
-        // see if an accessory with the same uuid has already been registered and restored from the cached devices we stored in the `configureAccessory` method
-        // above
-        const existingAccessory = this.accessories.get(uuid);
-
-        if (existingAccessory) {
-          // the accessory already exists
-          this.log.info(
-            "Restoring existing accessory from cache:",
-            existingAccessory.displayName,
-          );
-
-          // create the accessory handler for the restored accessory
-          this.withCheckedProtocol(deviceConfig)
-            .then((checkedConfig) =>
-              this.createAccessoryHandler(
-                existingAccessory,
-                checkedConfig,
-              )?.setupInputs(),
-            )
-            .catch((error) =>
-              this.log.error(`Could not set up '${deviceConfig.name}':`, error),
-            );
-
-          // after it has been restored, the existing accessory should be removed form the uuid list
-          existingAccessoriesUuids = existingAccessoriesUuids.filter(
-            (uuid) => uuid !== existingAccessory.UUID,
-          );
-        } else {
-          // the accessory does not yet exist, so we need to create it
-          this.log.info("Adding new accessory:", deviceConfig.name);
-
-          const accessory = new this.api.platformAccessory(
-            deviceConfig.name,
-            uuid,
-          );
-          this.publishNewAccessory(deviceConfig, accessory);
-        }
-      }
-    }
-
-    // remove platform accessories from cache when no longer present
-    for (const uuid of existingAccessoriesUuids) {
-      const existingAccessory = this.accessories.get(uuid);
-      if (existingAccessory) {
-        this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
-          existingAccessory,
-        ]);
-        this.log.info(
-          "Removing existing accessory from cache:",
-          existingAccessory.displayName,
+        this.log.info("Adding new accessory:", deviceConfig.name);
+        const accessory = new this.api.platformAccessory(
+          deviceConfig.name,
+          uuid,
         );
+        this.publishNewAccessory(deviceConfig, accessory);
       }
     }
 
