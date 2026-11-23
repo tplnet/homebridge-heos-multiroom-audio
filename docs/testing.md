@@ -76,6 +76,9 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 | Streaming source (Spotify / AirPlay) is shown as current input | ☐ | ☐ | ✅ (2.0.0) | ✅ (1.5.1-beta.8) |
 | Remote: play / pause | ✅ | ✅ | ✅ | ✅ |
 | Remote: next / previous track (radio / input: info in the log, 1.5.1-beta.7) | ✅ | ✅ | ✅ | ✅ |
+| Hybrid: switching off = real standby, switching on wakes the device (Home Amp, 2.0.1-beta.1) | – | – | ✅ | ✅ |
+| Hybrid: switching on continues the last music source (radio), or starts the favorite if it can't be resumed (ended Spotify session) (2.0.1-beta.2) | – | – | ✅ | ☐ |
+| Hybrid: the tile stays *On* while paused (automations bound to the tile keep running) (2.0.1-beta.2) | – | – | ✅ | ☐ |
 | Switch on after the device was idle for days: favorite starts with the first press (2.0.1-beta.1: checked and retried once) | ☐ | ☐ | ☐ (2.0.0: first start failed silently, second worked) | – |
 
 Results without a version were checked with 1.5.1-beta.5 (Homebridge 2.5.0). The Home 150 / 250 have only AUX In, so switching inputs is not tested there.
