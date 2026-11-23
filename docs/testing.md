@@ -93,14 +93,14 @@ Note: HEOS player ids can be negative (Dining Room, Garage, Kids Room). Control 
 - [ ] Restart the router / Wi-Fi. All devices reconnect.
 - [ ] Rapidly press the volume buttons of the remote and play/pause several times. Homebridge must not crash.
 - [x] Control the same device from the HEOS app while the Home app is open. States stay in sync (Home 150 / 250: start / stop, 1.5.1-beta.5).
-- [ ] Leave Homebridge running for 24 h and check the log for errors or warnings.
+- [x] Leave Homebridge running for 24 h and check the log for errors or warnings (1.5.1, 2026-11-19 to 2026-11-23: no errors or warnings).
 - [ ] Device discovery is still running after 24 h (no `Device discovery stopped` without a following restart). With `autoAddDiscoveredDevices`, a speaker switched on hours after the Homebridge start is added.
 
 ## 6. Adding to the Home app
 
 - [ ] Every device can be added with **+ → Add Accessory → More options…** and the setup code from the log.
 - [x] The pairing survives a Homebridge restart and a plugin update.
-- [x] Every device keeps its port across restarts (1.3.2: ports sorted by serial number, 52100–52105).
+- [x] Every device keeps its port across restarts (1.3.2: ports sorted by serial number; checked again with 1.5.1 after a full Homebridge restart).
 
 ## 7. Homebridge UI
 
