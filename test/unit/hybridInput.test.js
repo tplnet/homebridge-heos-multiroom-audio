@@ -104,8 +104,10 @@ describe("Hybrid: input changed on the receiver (AVR Control SI…)", () => {
 });
 
 describe("Hybrid: switching on resumes the music like HEOS CLI", () => {
-  function hybrid({ input = "spotify", resumeFails = false, knownInputIds = ["tv", "optical_in_1", "line_in_1"] } = {}) {
+  function hybrid({ input = "spotify", inputs, resumeFails = false, knownInputIds = ["tv", "optical_in_1", "line_in_1"] } = {}) {
     const calls = [];
+    // answers to getInput: before switching on, after switching on (default: the same input both times)
+    const answers = inputs ? [...inputs] : [input, input];
     const h = Object.create(DenonClientHybrid.prototype);
     Object.assign(h, {
       knownInputIds,
@@ -113,7 +115,11 @@ describe("Hybrid: switching on resumes the music like HEOS CLI", () => {
       debugLog: () => {},
       clientAvrControl: { setPower: async (power) => (calls.push(power ? "PWON" : "PWSTANDBY"), power) },
       clientHeosCli: {
-        getInput: async () => input,
+        getInput: async () => {
+          const answer = answers.length > 1 ? answers.shift() : answers[0];
+          if (answer instanceof Error) throw answer;
+          return answer;
+        },
         resumePlayback: async () => {
           calls.push("resume");
           if (resumeFails) throw new Error("timeout");
@@ -138,6 +144,25 @@ describe("Hybrid: switching on resumes the music like HEOS CLI", () => {
       assert.equal(await h.setPower(true), true);
       assert.deepEqual(calls, ["PWON"], input);
     }
+  });
+
+  it("receiver last used with an input: the source read in standby counts, even if HEOS reports none right after waking up", async () => {
+    // Marantz Cinema 60: in standby "inputs/aux1" (Apple TV), right after power on an empty payload ("")
+    const { h, calls } = hybrid({ inputs: ["aux1", ""], knownInputIds: ["bluray", "game", "aux1", "aux2"] });
+    assert.equal(await h.setPower(true), true);
+    assert.deepEqual(calls, ["PWON"]);
+  });
+
+  it("no source known before switching on, an input after: only switches on", async () => {
+    const { h, calls } = hybrid({ inputs: [new Error("timeout"), "tv"] });
+    assert.equal(await h.setPower(true), true);
+    assert.deepEqual(calls, ["PWON"]);
+  });
+
+  it("nothing known at all (e.g. after a power cut): continues / starts the favorite", async () => {
+    const { h, calls } = hybrid({ inputs: ["", ""] });
+    assert.equal(await h.setPower(true), true);
+    assert.deepEqual(calls, ["PWON", "resume"]);
   });
 
   it("stays switched on if resuming fails", async () => {

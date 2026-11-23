@@ -2,6 +2,12 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.0.1-beta.4 (2026-11-23)
+
+### Fixed
+
+- Hybrid: a receiver that was last used with an input (e.g. Apple TV on a Marantz Cinema 60) started the HEOS favorite when switched on (2.0.1-beta.2). Right after waking up, the receiver reports no source for a moment, so the input wasn't recognised. The last source is now read before switching on, while the device is still in standby, and checked again afterwards: if either is an input, the device is only switched on.
+
 ## 2.0.1-beta.3 (2026-11-23)
 
 ### Fixed

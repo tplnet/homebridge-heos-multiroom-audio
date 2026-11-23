@@ -149,23 +149,38 @@ export class DenonClientHybrid implements IDenonClient {
   private resumeDelayMs = 1500;
 
   public async setPower(power: boolean): Promise<boolean> {
+    // the last source is read before switching on: right after waking up, a receiver reports no source for a while
+    const inputBefore = power ? await this.readInput() : undefined;
     const result = await this.clientAvrControl.setPower(power);
     if (power) {
-      await this.resumeAfterPowerOn();
+      await this.resumeAfterPowerOn(inputBefore);
     }
     return result;
+  }
+
+  private async readInput(): Promise<string | undefined> {
+    try {
+      return await this.clientHeosCli.getInput();
+    } catch (error) {
+      this.debugLog("Could not read the current source:", error instanceof Error ? error.message : error);
+      return undefined;
+    }
   }
 
   /**
    * Like HEOS CLI, switching on continues the music, or starts the power on favorite / Quick Select slot if there
    * is nothing to resume. Not if an input (TV, HDMI, optical …) was the last source: then the device is only switched on.
    */
-  private async resumeAfterPowerOn() {
+  private async resumeAfterPowerOn(inputBefore: string | undefined) {
     try {
+      if (inputBefore !== undefined && this.isPhysicalInput(inputBefore)) {
+        this.debugLog(`Switched on, the last source is the input ${inputBefore}: not resuming playback.`);
+        return;
+      }
       await new Promise((resolve) => setTimeout(resolve, this.resumeDelayMs));
-      const input = await this.clientHeosCli.getInput();
-      if (this.isPhysicalInput(input)) {
-        this.debugLog(`Switched on, the last source is the input ${input}: not resuming playback.`);
+      const input = await this.readInput();
+      if (input !== undefined && this.isPhysicalInput(input)) {
+        this.debugLog(`Switched on, the current source is the input ${input}: not resuming playback.`);
         return;
       }
       await this.clientHeosCli.resumePlayback();
