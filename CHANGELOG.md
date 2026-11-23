@@ -2,7 +2,21 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
-## 2.0.0-beta.2 (2026-11-23)
+## 2.0.0 (2026-11-23)
+
+Combines 2.0.0-beta.1 and 2.0.0-beta.2.
+
+### Changed
+
+- **New platform name `HeosMultiroomAudio`** (was `DenonHeosAudio`, the name of the original plugin; suggested in the Homebridge verification review, so the configurations of both plugins can't clash). New installations use the new name right away.
+- **Updating from 1.x: your configuration keeps working.** The plugin still accepts `DenonHeosAudio` and logs a warning. Change the name once so the plugin's settings form shows your configuration again:
+  1. Homebridge UI → **JSON Config in the main menu** (the editor for the whole `config.json`). **Not** the plugin's own settings or its *JSON Config* (⋮ on the plugin): they only look for the new name, don't show your configuration and offer an empty new one.
+  2. In the plugin's block change only `"platform": "DenonHeosAudio"` to `"platform": "HeosMultiroomAudio"` – leave everything else, in particular `_bridge`.
+  3. Save and restart with **Restart HB Service & UI** (the Homebridge UI caches the platform name for up to 24 hours).
+
+  Child bridge, ports, devices and the pairing in the Home app stay the same. Details: [Platform name](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#platform-name).
+
+## 2.0.0-beta.2 (2026-11-23, not published)
 
 ### Fixed
 
