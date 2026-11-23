@@ -2,6 +2,19 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 1.5.3 (2026-11-23)
+
+Contains 1.5.3-beta.1: suggestions from the Homebridge verification review. The plugin is now **Verified by Homebridge**.
+
+### Fixed
+
+- Accessories that an older plugin version left in the Homebridge cache (when the devices were published on the bridge) were set up again but never published, so the device didn't appear. They are now removed from the cache at startup (log: `Removed … accessories of an older plugin version from the Homebridge cache`) and every device is published as TV accessory as usual. The Home app pairing stays the same.
+
+### Changed
+
+- README and troubleshooting: *AVR Control* and *Hybrid* keep a permanent connection on port 23; many receivers accept only one, which can lock out Home Assistant or another plugin. The troubleshooting page explains the options.
+- README: *Verified by Homebridge* badge.
+
 ## 1.5.3-beta.1 (2026-11-23)
 
 Suggestions from the Homebridge verification review.
