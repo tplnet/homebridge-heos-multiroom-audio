@@ -23,6 +23,7 @@
   },
   "keywords": [
     "homebridge-plugin",
+    "supports-hap",
     "homebridge",
     "heos",
     "heos-multiroom",

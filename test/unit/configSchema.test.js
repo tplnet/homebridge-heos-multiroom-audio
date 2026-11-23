@@ -161,3 +161,63 @@ describe("settings form layout", () => {
     );
   });
 });
+
+// checks of the Homebridge plugin verification (homebridge/plugins)
+describe("Homebridge verification checks", () => {
+  const schemas = [
+    "../../config.schema.json",
+    "../../schemas/config.schema.de.json",
+  ].map((file) => [
+    file,
+    JSON.parse(fs.readFileSync(new URL(file, import.meta.url), "utf8")),
+  ]);
+
+  it("uses `required` only as a list at object level (no `required: true/false` on single fields)", () => {
+    const booleans = [];
+    const walk = (node, path) => {
+      if (node && typeof node === "object") {
+        if (typeof node.required === "boolean") {
+          booleans.push(path);
+        }
+        if (node.required !== undefined && typeof node.required !== "boolean") {
+          assert.ok(
+            Array.isArray(node.required),
+            `${path}.required must be an array`,
+          );
+        }
+        for (const [key, value] of Object.entries(node.properties ?? {})) {
+          walk(value, `${path}.${key}`);
+        }
+        if (node.items) {
+          walk(node.items, `${path}[]`);
+        }
+      }
+    };
+    for (const [file, json] of schemas) {
+      walk(json.schema, file);
+    }
+    assert.deepEqual(booleans, []);
+  });
+
+  it("a device entry requires name, serial number, IP address and protocol", () => {
+    for (const [file, json] of schemas) {
+      assert.deepEqual(
+        json.schema.properties.devices.items.required,
+        ["name", "serialNumber", "ip", "controlProtocol"],
+        file,
+      );
+    }
+  });
+
+  it("package.json declares the supported transport (HAP)", () => {
+    const pkg = JSON.parse(
+      fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+    );
+    assert.ok(pkg.keywords.includes("homebridge-plugin"));
+    assert.ok(pkg.keywords.includes("supports-hap"));
+    assert.ok(
+      !pkg.keywords.includes("supports-matter"),
+      "the plugin doesn't register Matter accessories itself",
+    );
+  });
+});

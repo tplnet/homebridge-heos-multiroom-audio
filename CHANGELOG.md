@@ -2,7 +2,14 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
-## 1.5.1 (2026-11-19)
+## 1.5.2-beta.1 (2026-11-23)
+
+### Fixed
+
+- Plugin verification checks of Homebridge: the settings schema declares the required fields of a device entry (name, serial number, IP address, protocol) as a list at object level, as JSON Schema defines it, instead of `required: true/false` on single fields. The settings form and the plugin behave as before.
+- `package.json` declares that the plugin publishes its accessories over HAP (keyword `supports-hap`), as Homebridge UI 5.28 and later expect.
+
+
 
 Combines the betas 1.5.1-beta.1 to 1.5.1-beta.8.
 
