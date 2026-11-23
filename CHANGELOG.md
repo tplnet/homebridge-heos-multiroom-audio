@@ -16,7 +16,7 @@ Combines 2.0.0-beta.1 and 2.0.0-beta.2.
 
   Child bridge, ports, devices and the pairing in the Home app stay the same. Details: [Platform name](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#platform-name).
 
-## 2.0.0-beta.2 (2026-11-23, not published)
+## 2.0.0-beta.2 (2026-11-23)
 
 ### Fixed
 

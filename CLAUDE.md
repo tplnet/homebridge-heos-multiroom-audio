@@ -25,9 +25,9 @@ Maintained fork of hov3rcraft/homebridge-denon-heos-audio, renamed to "Homebridg
 
 ## Rules for all tplnet Homebridge projects
 
-These apply to `@tplnet/homebridge-tahoma`, `@tplnet/overkiz-client`, `homebridge-tahoma-local` and `@tplnet/homebridge-heos-multiroom-audio`. Keep the four projects consistent: a change to the release or check process in one of them goes into all of them. New tplnet projects adopt these rules from the start.
+These apply to `@tplnet/homebridge-tahoma` and `@tplnet/homebridge-heos-multiroom-audio` (`@tplnet/overkiz-client` and `homebridge-tahoma-local` are archived since 2026-11-23). Keep the projects consistent: a change to the release or check process in one of them goes into all of them. New tplnet projects adopt these rules from the start.
 
-Notes that concern several projects (a change to port, a new rule, what still has to be done in another project) are written into this section – in all four `CLAUDE.md` files – not only into a note of a Claude project: every session reads the `CLAUDE.md` of its repository, whichever Claude project it belongs to. When a change in one project still has to be ported to another one, note it here as an open item and remove it once it is done everywhere.
+Notes that concern several projects (a change to port, a new rule, what still has to be done in another project) are written into this section – in the `CLAUDE.md` of both projects – not only into a note of a Claude project: every session reads the `CLAUDE.md` of its repository, whichever Claude project it belongs to. When a change in one project still has to be ported to another one, note it here as an open item and remove it once it is done everywhere.
 
 ### Language and wording
 - Code, comments, README, CHANGELOG and commit messages in English. No German translation of the plugin (exception for now: the German settings form of `@tplnet/homebridge-heos-multiroom-audio`).
@@ -56,9 +56,8 @@ Notes that concern several projects (a change to port, a new rule, what still ha
 
 ### Homebridge UI and log
 - The window *Plugin Logs* (Homebridge UI → *Plugins* → ⋮) only shows log lines that start with the cyan prefix `[<name>]`, where `<name>` is the `name` of the plugin's config entry (without one: the package name, which Homebridge doesn't use for the plugin's lines – the window then stays empty except right after a restart). Every plugin's settings schema therefore has a `name` field with a default, and the plugin logs through the Homebridge logger. Own console output (e.g. a debug console log) uses the same prefix: `` `\x1b[36m[${config.name}]\x1b[39m` ``. Found in `@tplnet/homebridge-heos-multiroom-audio` 1.5.1-beta.8.
-- Open (2026-11-19): check the *Plugin Logs* window in a real Homebridge UI for `@tplnet/homebridge-tahoma` and `homebridge-tahoma-local`. Both schemas already have a required `name` with a default and the plugins don't write to the console directly, so they are probably fine. Remove this item once checked. (`@tplnet/overkiz-client` is a library without settings – not affected.)
+- Open (2026-11-19): check the *Plugin Logs* window in a real Homebridge UI for `@tplnet/homebridge-tahoma`. The schema already has a required `name` with a default and the plugin doesn't write to the console directly, so it is probably fine. Remove this item once checked.
 - Homebridge verification checks (homebridge/plugins, automatic): the settings schema must not use `"required": true/false` on single fields – required fields are listed as `"required": ["a", "b"]` at object level (JSON Schema); `package.json` keywords declare the transport: `supports-hap` for plugins that publish HAP accessories (`supports-matter` only for plugins that register Matter accessories themselves). Found in the verification request of `@tplnet/homebridge-heos-multiroom-audio` (fixed in 1.5.2-beta.1).
-- Open (2026-11-23): `@tplnet/homebridge-tahoma` (4×) and `homebridge-tahoma-local` (3×) still use `"required": true/false` and lack `supports-hap` – port the fix (beta first). Remove this item once done everywhere.
 
 ### Release process
 1. Write a `## X.Y.Z (YYYY-MM-DD)` section at the top of `CHANGELOG.md` **before** `npm version`. Each entry starts with what changes for the user (Apple Home, Homebridge UI, log), technical details after it. With several entries, group them under `### Added`, `### Changed`, `### Fixed`, `### Security`.
@@ -67,7 +66,6 @@ Notes that concern several projects (a change to port, a new rule, what still ha
 4. The maintainer approves the staged version with his passkey (npmjs.com → Staged Packages, or `npm stage approve <id>`).
 - Never run `npm publish` manually (npm Trusted Publishing is stage-only; a manual publish burns the version number).
 - `release-notes.yml` (Actions → Release notes → tag or `all`) refills existing releases from CHANGELOG.
-- Plugin depending on a new client version: release and approve the client first, then `npm install --prefer-online` in the plugin (otherwise ETARGET from the npm cache).
 
 ### Git and security
 - Commit as `tplnet <tplnet@users.noreply.github.com>`; never put the maintainer's real name or e-mail into commits or files.
