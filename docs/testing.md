@@ -77,7 +77,9 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 | Remote: play / pause | ✅ | ✅ | ✅ | ✅ |
 | Remote: next / previous track (radio / input: info in the log, 1.5.1-beta.7) | ✅ | ✅ | ✅ | ✅ |
 | Hybrid: switching off = real standby, switching on wakes the device (Home Amp, 2.0.1-beta.1) | – | – | ✅ | ✅ |
-| Hybrid: switching on continues the last music source (radio), or starts the favorite if it can't be resumed (ended Spotify session) (2.0.1-beta.2) | – | – | ✅ | ☐ |
+| Hybrid: switching on continues the last music source (radio), or starts the favorite if it can't be resumed (ended Spotify session) (2.0.1-beta.2) | – | – | ✅ | ✅ (2.0.1-beta.5) |
+| Hybrid: receiver last set to an input with its own remote (Apple TV) only switches on, no music (2.0.1-beta.5: input read via AVR Control `SI?`) | – | – | – | ✅ |
+| Hybrid: the Home app shows the receiver's real input (Apple TV), not the last HEOS source (TuneIn) (2.0.1-beta.6) | – | – | – | ✅ |
 | Hybrid: starting music in the HEOS app wakes the device from standby, the tile switches to *On* (2.0.1-beta.2) | – | – | ✅ | ☐ |
 | Hybrid: the device's automatic standby after a pause switches the tile to *Off* (Home Amp: within an hour) (2.0.1-beta.2) | – | – | ✅ | ☐ |
 | Hybrid: the tile stays *On* while paused (automations bound to the tile keep running) (2.0.1-beta.2) | – | – | ✅ | ☐ |
