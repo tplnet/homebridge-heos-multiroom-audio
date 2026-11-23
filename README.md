@@ -4,6 +4,7 @@
 
 # Homebridge HEOS Multiroom-Audio (tplnet)
 
+[![verified-by-homebridge](https://img.shields.io/badge/homebridge-verified-blueviolet?color=%23491F59&style=flat)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![npm](https://img.shields.io/npm/v/@tplnet/homebridge-heos-multiroom-audio)](https://www.npmjs.com/package/@tplnet/homebridge-heos-multiroom-audio)
 [![CI](https://github.com/tplnet/homebridge-heos-multiroom-audio/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/tplnet/homebridge-heos-multiroom-audio/actions/workflows/ci.yml)
 [![Compatibility & CVE check](https://github.com/tplnet/homebridge-heos-multiroom-audio/actions/workflows/compat.yml/badge.svg)](https://github.com/tplnet/homebridge-heos-multiroom-audio/actions/workflows/compat.yml)
