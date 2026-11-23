@@ -20,6 +20,17 @@ The settings form of the Homebridge UI covers everything described here (in Engl
 | **AVR Control** | Older AV receivers without HEOS | Real power on / standby | ❌ | ✅ |
 | **Hybrid** | AV receivers and amplifiers with HEOS (e.g. Marantz Cinema series, Denon AVR-X, Denon Home Amp) | Real power on / standby | ✅ | ✅ |
 
+**What the tile in the Home app means** – important for scenes and automations that follow the device (e.g. switching a subwoofer or a fan with it):
+
+| | HEOS CLI | Hybrid / AVR Control |
+| --- | --- | --- |
+| Tile *On* | the device is **playing** | the device is **switched on** (also while paused) |
+| Pause / stop in the HEOS app | tile goes *Off* | tile stays *On* |
+| Device goes to standby by itself (automatic standby) | – | tile goes *Off* |
+| Music started in the HEOS / Spotify app wakes the device | tile goes *On* | tile goes *On* |
+
+So with *HEOS CLI* an automation bound to the tile switches off at every pause; with *Hybrid* only when the device really goes to standby.
+
 **Why does "power" mean "playback" with HEOS CLI?** HEOS speakers have no real standby command. The plugin therefore treats "playing" as on and "stopped/paused" as off.
 Switching on resumes the last source. If there is nothing to resume (e.g. after the speaker was restarted or a streaming session ended), or playback doesn't start within 8 seconds, the first HEOS favorite is started, so switching on also works in scenes and automations. You can choose another favorite or turn this off with `powerOnFavorite`.
 
@@ -32,6 +43,7 @@ What is started when there is nothing to resume, in this order:
 > **Requirement:** at least one favorite in the HEOS app (*Music → Favorites*, e.g. a radio station), or a Quick Select slot stored on the device and set in `powerOnQuickSelect`. Without either, a speaker that has nothing to resume can't be switched on from Apple Home.
 
 **Hybrid** uses AVR Control for power and HEOS CLI for everything else. Pick it whenever discovery reports both protocols and you want real standby.
+Switching on wakes the device and then, like HEOS CLI, continues the last music source – or starts the favorite / Quick Select slot if there is nothing to resume (since 2.0.1). If an **input** was the last source (TV, HDMI, optical, line in …), the device is only switched on: a receiver that was last used for TV doesn't start music.
 
 **Wrong protocol?** At startup the plugin checks which protocols the device supports. If the configured one isn't supported (e.g. *Hybrid* on a Denon Home 150), it uses a supported one instead and logs a warning:
 `"Office Speaker" doesn't support AVR Control (port 23 closed), so "Hybrid" can't be used. Using "HEOS CLI" instead – please change "Control Protocol" in the plugin settings.`
