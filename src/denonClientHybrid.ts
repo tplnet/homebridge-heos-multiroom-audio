@@ -289,7 +289,19 @@ export class DenonClientHybrid implements IDenonClient {
     return this.clientHeosCli.setVolumeDown(volumeDecrement);
   }
 
-  public getInput(raceStatus?: RaceStatus): Promise<string> {
+  /**
+   * The receiver's own input comes from AVR Control: HEOS doesn't notice an input changed on the receiver or with
+   * its remote and keeps reporting its last music source (e.g. TuneIn while the receiver is on Apple TV).
+   * Only for HEOS music (NET, Bluetooth …), or if AVR Control doesn't answer, HEOS is asked for the exact source.
+   */
+  public async getInput(raceStatus?: RaceStatus): Promise<string> {
+    const avrInput = await this.readAvrInput();
+    if (avrInput !== undefined && !DenonClientHybrid.isHeosMusicSource(avrInput)) {
+      const inputID = DenonClientHybrid.heosInputFromAvrInput(avrInput, this.knownInputIds);
+      if (inputID) {
+        return inputID;
+      }
+    }
     return this.clientHeosCli.getInput(raceStatus);
   }
 

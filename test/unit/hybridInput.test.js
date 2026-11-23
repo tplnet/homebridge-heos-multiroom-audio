@@ -213,3 +213,35 @@ describe("Hybrid: switching on resumes the music like HEOS CLI", () => {
     assert.deepEqual(set, ["favorite 2", "quick select 3"]);
   });
 });
+
+describe("Hybrid: current input shown in the Home app", () => {
+  function hybrid({ avrInput, heosInput = "tunein" }) {
+    const h = Object.create(DenonClientHybrid.prototype);
+    Object.assign(h, {
+      knownInputIds: ["bluray", "game", "aux1", "aux2"],
+      debugLog: () => {},
+      clientAvrControl: {
+        getInput: async () => {
+          if (avrInput === undefined) throw new Error("no answer");
+          return avrInput;
+        },
+      },
+      clientHeosCli: { getInput: async () => heosInput },
+    });
+    return h;
+  }
+
+  it("receiver on Apple TV (set with its remote): shows Apple TV, not the stale HEOS source", async () => {
+    assert.equal(await hybrid({ avrInput: "AUX1" }).getInput(), "aux1");
+    assert.equal(await hybrid({ avrInput: "BD" }).getInput(), "bluray");
+  });
+
+  it("HEOS music on the receiver (NET): shows the exact HEOS source", async () => {
+    assert.equal(await hybrid({ avrInput: "NET", heosInput: "tunein" }).getInput(), "tunein");
+  });
+
+  it("AVR Control doesn't answer, or an input HEOS doesn't offer: asks HEOS", async () => {
+    assert.equal(await hybrid({ avrInput: undefined, heosInput: "aux1" }).getInput(), "aux1");
+    assert.equal(await hybrid({ avrInput: "PHONO", heosInput: "spotify" }).getInput(), "spotify");
+  });
+});

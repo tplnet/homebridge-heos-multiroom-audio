@@ -2,6 +2,12 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.0.1-beta.6 (2026-11-23)
+
+### Fixed
+
+- Hybrid: the Home app showed the last HEOS music source (e.g. *TuneIn*) as current input although the receiver was on another input (e.g. Apple TV, set with its remote). The current input is now read from the receiver via AVR Control; only for HEOS music (`NET`, Bluetooth …) the exact source comes from HEOS.
+
 ## 2.0.1-beta.5 (2026-11-23)
 
 ### Fixed
