@@ -597,13 +597,17 @@ export class DenonClientHeosCli extends DenonClient {
     if (!power) {
       playing = isPlaying[await this.setPlaying(Playing.STOP)];
     } else {
-      playing = await this.powerOn();
+      playing = await this.resumePlayback();
     }
     this.powerUpdateCallback?.(playing);
     return playing;
   }
 
-  private async powerOn(): Promise<boolean> {
+  /**
+   * Continues the current media, or starts the power on favorite / Quick Select slot if there is nothing to resume.
+   * Also used by Hybrid after switching the device on.
+   */
+  public async resumePlayback(): Promise<boolean> {
     const PLAY = DenonClientHeosCli.PROTOCOL.PLAY_STATE.VALUES.PLAY.VALUE;
     const rawState = await this.sendCommand(DenonClientHeosCli.PROTOCOL.PLAY_STATE, CommandMode.GET, {});
     if (rawState === PLAY) {

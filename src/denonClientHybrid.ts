@@ -145,8 +145,58 @@ export class DenonClientHybrid implements IDenonClient {
     return this.clientAvrControl.getPower();
   }
 
-  public setPower(power: boolean): Promise<boolean> {
-    return this.clientAvrControl.setPower(power);
+  /** Time HEOS gets after the device was switched on before playback is resumed (overridable for tests). */
+  private resumeDelayMs = 1500;
+
+  public async setPower(power: boolean): Promise<boolean> {
+    const result = await this.clientAvrControl.setPower(power);
+    if (power) {
+      await this.resumeAfterPowerOn();
+    }
+    return result;
+  }
+
+  /**
+   * Like HEOS CLI, switching on continues the music, or starts the power on favorite / Quick Select slot if there
+   * is nothing to resume. Not if an input (TV, HDMI, optical …) was the last source: then the device is only switched on.
+   */
+  private async resumeAfterPowerOn() {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, this.resumeDelayMs));
+      const input = await this.clientHeosCli.getInput();
+      if (this.isPhysicalInput(input)) {
+        this.debugLog(`Switched on, the last source is the input ${input}: not resuming playback.`);
+        return;
+      }
+      await this.clientHeosCli.resumePlayback();
+    } catch (error) {
+      // the device is on anyway, only the music didn't continue
+      this.debugLog("Could not resume playback after switching on:", error instanceof Error ? error.message : error);
+    }
+  }
+
+  private isPhysicalInput(inputID: string): boolean {
+    return (
+      this.knownInputIds.includes(inputID) ||
+      inputID === "cd" ||
+      DenonClientHeosCli.INPUT_SOURCES.some((input) => input.inputID === inputID)
+    );
+  }
+
+  public setPowerOnFavorite(preset: number, infoLog?: (message: string) => void) {
+    this.clientHeosCli.setPowerOnFavorite(preset, infoLog);
+  }
+
+  public setPowerOnQuickSelect(slot: number) {
+    this.clientHeosCli.setPowerOnQuickSelect(slot);
+  }
+
+  public getFavorites(): Promise<string[]> {
+    return this.clientHeosCli.getFavorites();
+  }
+
+  public getQuickSelects(): Promise<string[]> {
+    return this.clientHeosCli.getQuickSelects();
   }
 
   public getPlaying(raceStatus: RaceStatus): Promise<Playing> {

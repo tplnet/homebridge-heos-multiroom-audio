@@ -102,3 +102,62 @@ describe("Hybrid: input changed on the receiver (AVR Control SI…)", () => {
     assert.deepEqual(reported, []);
   });
 });
+
+describe("Hybrid: switching on resumes the music like HEOS CLI", () => {
+  function hybrid({ input = "spotify", resumeFails = false, knownInputIds = ["tv", "optical_in_1", "line_in_1"] } = {}) {
+    const calls = [];
+    const h = Object.create(DenonClientHybrid.prototype);
+    Object.assign(h, {
+      knownInputIds,
+      resumeDelayMs: 0,
+      debugLog: () => {},
+      clientAvrControl: { setPower: async (power) => (calls.push(power ? "PWON" : "PWSTANDBY"), power) },
+      clientHeosCli: {
+        getInput: async () => input,
+        resumePlayback: async () => {
+          calls.push("resume");
+          if (resumeFails) throw new Error("timeout");
+          return true;
+        },
+      },
+    });
+    return { h, calls };
+  }
+
+  it("switches on and continues the music (or starts the favorite) if a HEOS music source was last", async () => {
+    for (const input of ["spotify", "airplay", "tunein", "1024"]) {
+      const { h, calls } = hybrid({ input });
+      assert.equal(await h.setPower(true), true);
+      assert.deepEqual(calls, ["PWON", "resume"], input);
+    }
+  });
+
+  it("only switches on if an input was the last source (TV, HDMI, optical …)", async () => {
+    for (const input of ["tv", "optical_in_1", "aux1", "hdmi_in_1", "cd"]) {
+      const { h, calls } = hybrid({ input });
+      assert.equal(await h.setPower(true), true);
+      assert.deepEqual(calls, ["PWON"], input);
+    }
+  });
+
+  it("stays switched on if resuming fails", async () => {
+    const { h, calls } = hybrid({ resumeFails: true });
+    assert.equal(await h.setPower(true), true);
+    assert.deepEqual(calls, ["PWON", "resume"]);
+  });
+
+  it("switching off only sends standby", async () => {
+    const { h, calls } = hybrid();
+    assert.equal(await h.setPower(false), false);
+    assert.deepEqual(calls, ["PWSTANDBY"]);
+  });
+
+  it("passes favorite and Quick Select on to HEOS", () => {
+    const set = [];
+    const h = Object.create(DenonClientHybrid.prototype);
+    h.clientHeosCli = { setPowerOnFavorite: (p) => set.push(`favorite ${p}`), setPowerOnQuickSelect: (q) => set.push(`quick select ${q}`) };
+    h.setPowerOnFavorite(2);
+    h.setPowerOnQuickSelect(3);
+    assert.deepEqual(set, ["favorite 2", "quick select 3"]);
+  });
+});

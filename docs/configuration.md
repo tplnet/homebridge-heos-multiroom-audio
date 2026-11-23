@@ -143,8 +143,8 @@ See [Apple Home](apple-home.md).
 | `devices[].volumeLimitEnabled` | no | `false` | Enables the volume limit. |
 | `devices[].volumeLimit` | no | `99` | 0–99. With a limit, 100 % in the Home app equals this value on the device. |
 | `devices[].volumeStepSize` | no | `2` | 1–10. Volume change per press of the volume buttons in the Remote. |
-| `devices[].powerOnFavorite` | no | `1` | HEOS CLI only: HEOS favorite that is started when the speaker is switched on but has nothing to resume (position in the favorite list of the HEOS app, *Music → Favorites*: 1 = first, up to 200; 0 = disabled). The favorite must exist in the HEOS app. Also used for automatically added devices. Not used while `powerOnQuickSelect` is set. |
-| `devices[].powerOnQuickSelect` | no | `0` | HEOS CLI only: Quick Select slot of the device (the numbered buttons, e.g. 1–3 on a Denon Home 150, 1–6 on a Denon Home 300) that is started instead of the HEOS favorite when the speaker has nothing to resume. 0 = use the HEOS favorite. Takes precedence over `powerOnFavorite`. |
+| `devices[].powerOnFavorite` | no | `1` | HEOS CLI and Hybrid: HEOS favorite that is started when the device is switched on but has nothing to resume (position in the favorite list of the HEOS app, *Music → Favorites*: 1 = first, up to 200; 0 = disabled). The favorite must exist in the HEOS app. Also used for automatically added devices. Not used while `powerOnQuickSelect` is set. |
+| `devices[].powerOnQuickSelect` | no | `0` | HEOS CLI and Hybrid: Quick Select slot of the device (the numbered buttons, e.g. 1–3 on a Denon Home 150, 1–6 on a Denon Home 300) that is started instead of the HEOS favorite when the device has nothing to resume. 0 = use the HEOS favorite. Takes precedence over `powerOnFavorite`. |
 | `devices[].inputs` | no | `[]` | Inputs to show in the Home app, see [Inputs](#inputs). |
 | `devices[].inputs[].inputID` | yes | | Input ID (depends on the protocol, see below). Entries without input ID or name are ignored. |
 | `devices[].inputs[].name` | yes | | Name shown in the Home app. |

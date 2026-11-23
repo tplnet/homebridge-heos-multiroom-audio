@@ -2,6 +2,13 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.0.1-beta.2 (2026-11-23)
+
+### Changed
+
+- **Hybrid: switching on continues the music**, like HEOS CLI: after the device has woken up, the last HEOS music source (Spotify, radio, AirPlay …) continues; if there is nothing to resume, the *Power On Favorite* / *Power On Quick Select* slot is started (with the check and retry of 2.0.1-beta.1). If an input (TV, HDMI, optical …) was the last source, the device is only switched on as before – a receiver that was last used for TV doesn't start music. Until now Hybrid only switched the device on and the music had to be started separately (seen on a Denon Home Amp).
+- Settings form and documentation: *Power On Favorite* and *Power On Quick Select* apply to HEOS CLI and Hybrid.
+
 ## 2.0.1-beta.1 (2026-11-23)
 
 ### Fixed

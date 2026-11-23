@@ -48,7 +48,7 @@ Repeat these steps for every device. You only have to do it once per device. Upd
 
 | Action | What happens |
 | --- | --- |
-| Power button | Power on / standby (AVR Control, Hybrid) or play / stop (HEOS CLI). With HEOS CLI, switching on resumes the last source; if there is none, the first HEOS favorite is started (see `powerOnFavorite`). |
+| Power button | Power on / standby (AVR Control, Hybrid) or play / stop (HEOS CLI). With HEOS CLI and Hybrid, switching on resumes the last music source; if there is none, the first HEOS favorite is started (see `powerOnFavorite`). With Hybrid, if an input (TV, HDMI, optical …) was the last source, the device is only switched on. |
 | Input picker | Switches the input |
 | Control Center → Remote → volume buttons on your iPhone | Volume up / down by `volumeStepSize` |
 | Remote → centre button / play-pause | Play / pause (HEOS CLI, Hybrid) |
