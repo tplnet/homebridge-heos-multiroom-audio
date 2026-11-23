@@ -2,6 +2,15 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.0.1-beta.3 (2026-11-23)
+
+### Fixed
+
+- A device that isn't reachable (e.g. switched off at the mains) no longer floods the log: instead of an error with stack trace at every query of the Home app, the plugin logs one warning (`The device is not reachable … Apple Home shows "No Response" until it is back`) and an info when it is back (`The device is reachable again.`). Details are in the debug log.
+- If a device wasn't reachable at startup, its inputs are now read as soon as it answers; until now the input list stayed empty until the next restart.
+- A speaker that was just switched on at the mains reports no source yet; this is no longer logged as an error ("Payload does not include sid").
+- Spelling in log messages ("occurred").
+
 ## 2.0.1-beta.2 (2026-11-23)
 
 ### Changed

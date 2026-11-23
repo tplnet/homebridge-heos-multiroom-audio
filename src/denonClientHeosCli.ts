@@ -795,6 +795,10 @@ export class DenonClientHeosCli extends DenonClient {
 
   public static inputPayloadToInputID(payload_str: string): string {
     const payload = JSON.parse(payload_str);
+    if (!payload || (payload.sid === undefined && payload.mid === undefined)) {
+      // no source yet, e.g. right after the speaker was switched on at the mains: "payload": {}
+      return "";
+    }
     if (!payload.sid) {
       throw new InvalidResponseException("Payload does not include sid!", undefined, payload_str);
     }

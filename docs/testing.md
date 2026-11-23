@@ -53,7 +53,7 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 - [x] All configured devices start without errors.
 - [x] Manufacturer, model and firmware version are shown in the accessory details in the Home app (Cinema 60, 1.5.1-beta.5).
 - [ ] A device with a wrong `controlProtocol` is reported in the log and skipped, and the other devices still work.
-- [ ] Homebridge starts while one device is unplugged, and that device shows *No Response*.
+- [x] Homebridge starts while one device is unplugged, and that device shows *No Response*; the other devices start normally and keep their ports; after plugging it in the device works again without restart (Denon Home 150, 2.0.1-beta.2). 2.0.1-beta.3: one warning instead of an error at every query, inputs read once it is back.
 
 ## 4. Controls (per device)
 
