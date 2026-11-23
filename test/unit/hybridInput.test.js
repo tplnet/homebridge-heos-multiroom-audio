@@ -104,7 +104,7 @@ describe("Hybrid: input changed on the receiver (AVR Control SI…)", () => {
 });
 
 describe("Hybrid: switching on resumes the music like HEOS CLI", () => {
-  function hybrid({ input = "spotify", inputs, resumeFails = false, knownInputIds = ["tv", "optical_in_1", "line_in_1"] } = {}) {
+  function hybrid({ input = "spotify", inputs, avrInput, resumeFails = false, knownInputIds = ["tv", "optical_in_1", "line_in_1"] } = {}) {
     const calls = [];
     // answers to getInput: before switching on, after switching on (default: the same input both times)
     const answers = inputs ? [...inputs] : [input, input];
@@ -113,7 +113,14 @@ describe("Hybrid: switching on resumes the music like HEOS CLI", () => {
       knownInputIds,
       resumeDelayMs: 0,
       debugLog: () => {},
-      clientAvrControl: { setPower: async (power) => (calls.push(power ? "PWON" : "PWSTANDBY"), power) },
+      clientAvrControl: {
+        setPower: async (power) => (calls.push(power ? "PWON" : "PWSTANDBY"), power),
+        // default: AVR Control doesn't answer, the HEOS check is used
+        getInput: async () => {
+          if (avrInput instanceof Error || avrInput === undefined) throw avrInput ?? new Error("no answer");
+          return avrInput;
+        },
+      },
       clientHeosCli: {
         getInput: async () => {
           const answer = answers.length > 1 ? answers.shift() : answers[0];
@@ -163,6 +170,26 @@ describe("Hybrid: switching on resumes the music like HEOS CLI", () => {
     const { h, calls } = hybrid({ inputs: ["", ""] });
     assert.equal(await h.setPower(true), true);
     assert.deepEqual(calls, ["PWON", "resume"]);
+  });
+
+  it("receiver set to Apple TV with its remote: AVR Control reports the input, HEOS still its last music source", async () => {
+    // Marantz Cinema 60: SI? → AUX1, HEOS now playing: TuneIn (stale)
+    const { h, calls } = hybrid({ avrInput: "AUX1", input: "tunein", knownInputIds: ["bluray", "game", "aux1", "aux2"] });
+    assert.equal(await h.setPower(true), true);
+    assert.deepEqual(calls, ["PWON"]);
+  });
+
+  it("AVR Control reports HEOS music (NET): continues the music / starts the favorite", async () => {
+    for (const avrInput of ["NET", "BT", "USB/IPOD"]) {
+      const { h, calls } = hybrid({ avrInput, input: "tv" });
+      assert.equal(await h.setPower(true), true);
+      assert.deepEqual(calls, ["PWON", "resume"], avrInput);
+    }
+  });
+
+  it("AVR Control input codes: inputs vs. HEOS music sources", () => {
+    for (const code of ["AUX1", "BD", "GAME1", "TV", "CBL/SAT", "MPLAY", "PHONO"]) assert.equal(DenonClientHybrid.isHeosMusicSource(code), false, code);
+    for (const code of ["NET", "BT", "USB", "SERVER", "IRADIO"]) assert.equal(DenonClientHybrid.isHeosMusicSource(code), true, code);
   });
 
   it("stays switched on if resuming fails", async () => {

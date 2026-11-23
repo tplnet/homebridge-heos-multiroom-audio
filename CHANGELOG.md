@@ -2,6 +2,12 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.0.1-beta.5 (2026-11-23)
+
+### Fixed
+
+- Hybrid: the receiver still started the HEOS favorite when it was last set to an input with its own remote (e.g. Apple TV on a Marantz Cinema 60). HEOS doesn't notice an input changed on the receiver and keeps reporting the last music source (e.g. TuneIn). Before switching on, the plugin now asks the receiver itself via AVR Control (`SI?`): on a HEOS music source (`NET`, Bluetooth, USB …) the music continues or the favorite starts; on an input (`AUX1`, `BD`, `GAME` …) the receiver is only switched on. If AVR Control doesn't answer, the check via HEOS of 2.0.1-beta.4 is used.
+
 ## 2.0.1-beta.4 (2026-11-23)
 
 ### Fixed

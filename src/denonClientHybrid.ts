@@ -149,13 +149,48 @@ export class DenonClientHybrid implements IDenonClient {
   private resumeDelayMs = 1500;
 
   public async setPower(power: boolean): Promise<boolean> {
-    // the last source is read before switching on: right after waking up, a receiver reports no source for a while
-    const inputBefore = power ? await this.readInput() : undefined;
+    // The last source is read before switching on. AVR Control knows the receiver's real input (HEOS doesn't notice
+    // an input changed on the receiver or with its remote); HEOS is only the fallback (right after waking up, a
+    // receiver reports no source there for a while).
+    const avrInput = power ? await this.readAvrInput() : undefined;
+    const inputBefore = power && avrInput === undefined ? await this.readInput() : undefined;
     const result = await this.clientAvrControl.setPower(power);
     if (power) {
-      await this.resumeAfterPowerOn(inputBefore);
+      if (avrInput !== undefined) {
+        if (DenonClientHybrid.isHeosMusicSource(avrInput)) {
+          await this.resumeHeosPlayback();
+        } else {
+          this.debugLog(`Switched on, the receiver's input is ${avrInput}: not resuming playback.`);
+        }
+      } else {
+        await this.resumeAfterPowerOn(inputBefore);
+      }
     }
     return result;
+  }
+
+  /** True if the AVR Control input code is a HEOS music source (network, Bluetooth, USB …), not an input like AUX1 or BD. */
+  public static isHeosMusicSource(avrInput: string): boolean {
+    return DenonClientHybrid.AVR_STREAMING_INPUTS.includes(avrInput.trim().toUpperCase());
+  }
+
+  private async readAvrInput(): Promise<string | undefined> {
+    try {
+      const input = await this.clientAvrControl.getInput();
+      return typeof input === "string" && input.trim() !== "" ? input.trim() : undefined;
+    } catch (error) {
+      this.debugLog("Could not read the receiver's input via AVR Control:", error instanceof Error ? error.message : error);
+      return undefined;
+    }
+  }
+
+  private async resumeHeosPlayback() {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, this.resumeDelayMs));
+      await this.clientHeosCli.resumePlayback();
+    } catch (error) {
+      this.debugLog("Could not resume playback after switching on:", error instanceof Error ? error.message : error);
+    }
   }
 
   private async readInput(): Promise<string | undefined> {
