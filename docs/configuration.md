@@ -203,11 +203,13 @@ New features and fixes are published as a **beta** first (e.g. `1.5.0-beta.1`) a
 
 Since version 2.0.0 the platform name in `config.json` is **`HeosMultiroomAudio`**. Up to version 1.x it was `DenonHeosAudio` (the name of the original plugin).
 
-A configuration with the old name keeps working: the plugin starts and logs a warning. The settings form of the Homebridge UI only shows the configuration under the new name, so change it once:
+A configuration with the old name keeps working: the plugin starts and logs a warning. The settings form of the Homebridge UI only shows the configuration under the new name, so change it once – in the editor for the **whole** `config.json`:
 
-1. Homebridge UI → *Plugins* → ⋮ on this plugin → *JSON Config*.
-2. Change `"platform": "DenonHeosAudio"` to `"platform": "HeosMultiroomAudio"` and save.
-3. Restart the plugin's child bridge (or Homebridge).
+> **Don't use the plugin's own settings or its *JSON Config* (⋮ on the plugin) for this.** They only look for the new name, don't show your existing configuration and offer an empty new one instead.
+
+1. Homebridge UI → **JSON Config** in the main menu (the editor for the whole `config.json`).
+2. Find the block with `"platform": "DenonHeosAudio"` and change only this line to `"platform": "HeosMultiroomAudio"`. Leave everything else as it is, in particular `_bridge` (child bridge).
+3. Save and restart with **Restart HB Service & UI** (Homebridge UI → power icon). The Homebridge UI caches the platform name of a plugin for up to 24 hours – after this restart the plugin's settings form shows your configuration again.
 
 All other settings, the child bridge, the ports and the pairing in Apple Home stay the same.
 

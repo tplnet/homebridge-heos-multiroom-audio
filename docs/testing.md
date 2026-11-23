@@ -107,6 +107,7 @@ Note: HEOS player ids can be negative (Dining Room, Garage, Kids Room). Control 
 - [x] With the UI language set to Deutsch, the plugin settings form is shown in German (1.2.6).
 - [x] Dropdowns in the settings form don't make the form move with the mouse (`orderable: false`).
 - [x] The settings form opens and saves without "Config validation failed" (1.3.4).
+- [x] Platform name `HeosMultiroomAudio` (2.0.0-beta.1): a 1.x configuration (`DenonHeosAudio`) keeps working; after changing the name in *JSON Config* of the main menu and *Restart HB Service & UI* there is no warning, the child bridge, ports and Home app pairing stay the same and the settings form shows the configuration again. The plugin's own *JSON Config* doesn't show the old configuration (it offers an empty new one), and right after the update the UI still demands the old name until *Restart HB Service & UI* (cached for up to 24 h) – documented in 2.0.0-beta.2.
 - [x] With the required fields declared as a list (1.5.2-beta.1), the settings form still opens, marks name, serial number, IP address and protocol of a device entry as required and saves without errors; without a name the plugin logs a hint at startup, after saving the log lines carry the name.
 - [x] *Plugins* → ⋮ → *Plugin Logs* shows the log of this plugin, also later than right after a restart (name set in the settings, 1.5.1-beta.8).
 - [x] A power on favorite that doesn't exist (e.g. 150) is reported as a warning at startup (1.3.4, verified with 1.5.1-beta.5).

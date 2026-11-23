@@ -2,11 +2,17 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.0.0-beta.2 (2026-11-23)
+
+### Fixed
+
+- Instructions for changing the platform name (log warning and [Platform name](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#platform-name)): change it in **JSON Config in the main menu** of the Homebridge UI (the editor for the whole `config.json`). The plugin's own settings and *JSON Config* only look for the new name, don't show the existing configuration and offer an empty new one instead. Then restart with *Restart HB Service & UI* – the Homebridge UI caches the platform name of a plugin for up to 24 hours.
+
 ## 2.0.0-beta.1 (2026-11-23)
 
 ### Changed
 
-- **New platform name `HeosMultiroomAudio`** (was `DenonHeosAudio`, the name of the original plugin; suggested in the Homebridge verification review, so the configurations of both plugins can't clash). **Existing configurations keep working:** the plugin still accepts `DenonHeosAudio` and logs a warning. Change it once so the settings form shows your configuration again: Homebridge UI → *Plugins* → ⋮ → *JSON Config* → `"platform": "HeosMultiroomAudio"` → save → restart. Child bridge, ports and the pairing in the Home app stay the same. See [Platform name](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#platform-name).
+- **New platform name `HeosMultiroomAudio`** (was `DenonHeosAudio`, the name of the original plugin; suggested in the Homebridge verification review, so the configurations of both plugins can't clash). **Existing configurations keep working:** the plugin still accepts `DenonHeosAudio` and logs a warning. Change it once so the settings form shows your configuration again – see [Platform name](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#platform-name) (instructions corrected in 2.0.0-beta.2). Child bridge, ports and the pairing in the Home app stay the same. See [Platform name](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#platform-name).
 
 ## 1.5.3 (2026-11-23)
 

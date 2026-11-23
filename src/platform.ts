@@ -572,7 +572,7 @@ export class LegacyDenonAudioPlatform extends DenonAudioPlatform {
   constructor(log: Logger, config: PlatformConfig, api: API) {
     super(log, config, api);
     this.log.warn(
-      `The platform name "${LEGACY_PLATFORM_NAME}" in config.json is outdated. Change "platform": "${LEGACY_PLATFORM_NAME}" to "platform": "${PLATFORM_NAME}" (Homebridge UI → Plugins → ⋮ on this plugin → JSON Config), then restart. Until then the plugin settings form doesn't show this configuration. Everything else keeps working, also the pairing in the Home app.`,
+      `The platform name "${LEGACY_PLATFORM_NAME}" in config.json is outdated. In the Homebridge UI open "JSON Config" in the main menu (not the one of this plugin, which doesn't show this configuration), change "platform": "${LEGACY_PLATFORM_NAME}" to "platform": "${PLATFORM_NAME}", save and restart with "Restart HB Service & UI". Until then the plugin settings form doesn't show this configuration. Everything else keeps working, also the pairing in the Home app.`,
     );
   }
 }

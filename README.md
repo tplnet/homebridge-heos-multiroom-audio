@@ -82,7 +82,7 @@ npm install @tplnet/homebridge-heos-multiroom-audio
 Running it on a [child bridge](https://github.com/homebridge/homebridge/wiki/Child-Bridges) is recommended.
 
 - **Beta versions:** new features are published as a beta first – how to try one: [Beta versions](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#beta-versions).
-- **Updating from 1.x:** the platform name is now `HeosMultiroomAudio` (was `DenonHeosAudio`). Your configuration keeps working; change the name once so the settings form shows it again – see [Platform name](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#platform-name).
+- **Updating from 1.x:** the platform name is now `HeosMultiroomAudio` (was `DenonHeosAudio`). Your configuration keeps working; change the name once in *JSON Config* of the main menu (not the plugin's own) so the settings form shows it again – see [Platform name](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#platform-name).
 - <a id="switching-from-tplnethomebridge-denon-heos-audio"></a>**Switching** from `@tplnet/homebridge-denon-heos-audio` (the former name of this plugin) or from the original `homebridge-denon-heos-audio`: the two packages must not be installed at the same time – see [Switching from another package](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#switching-from-another-package).
 
 ## Quick start
