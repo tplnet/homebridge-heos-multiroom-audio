@@ -2,6 +2,18 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.1.0-beta.1 (2026-11-24)
+
+Contains all fixes of 2.0.1-beta.1 to 2.0.1-beta.6 (there is no 2.0.1 release).
+
+### Added
+
+- **Debug log per device:** new option *Debug log* in the device entry (settings form: section *Troubleshooting*, config: `debug`). All commands and answers of this one device (HEOS and AVR Control) are written to the normal log, marked with `[debug]`, without the Debug Mode of Homebridge or the child bridge. At startup the plugin also logs the protocols the device supports and the inputs, HEOS favorites and Quick Select slots it reports. See [Debug log](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/troubleshooting.md#debug-log).
+
+### Changed
+
+- HEOS CLI: the playing position the device reports every second while playing is no longer written to the debug log.
+
 ## 2.0.1-beta.6 (2026-11-23)
 
 ### Fixed

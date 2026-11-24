@@ -482,7 +482,10 @@ export class DenonClientHeosCli extends DenonClient {
       return; // not this player
     }
 
-    this.debugLog("Received change event:", JSON.stringify(r_obj));
+    // the playing position is reported every second while playing: not logged (would flood the debug log)
+    if (!command.endsWith("player_now_playing_progress")) {
+      this.debugLog("Received change event:", JSON.stringify(r_obj));
+    }
 
     const matchEvent = (regex: RegExp, description: string): string => {
       const match = message.match(regex);

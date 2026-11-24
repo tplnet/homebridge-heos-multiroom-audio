@@ -117,6 +117,12 @@
               "maximum": 6,
               "default": 0
             },
+            "debug": {
+              "title": "Debug-Log",
+              "description": "Schreibt alle Befehle und Antworten dieses Geräts (HEOS und AVR Control) und was es beim Start meldet (Protokolle, Eingänge, Favoriten, Quick-Select-Plätze) ins normale Log. Der Debug-Modus von Homebridge oder der Child Bridge ist dafür nicht nötig. Nur zur Fehlersuche: danach wieder ausschalten.",
+              "type": "boolean",
+              "default": false
+            },
             "inputs": {
               "title": "Eingänge",
               "description": "Eingänge des Geräts. Wenn du hier Eingänge einträgst, sind genau diese in der Home-App auswählbar. Ohne Eintrag werden die Eingänge vom Gerät gelesen.",
@@ -323,6 +329,13 @@
                       "listItems": 0
                     }
                   ]
+                },
+                {
+                  "type": "section",
+                  "title": "Fehlersuche",
+                  "expandable": true,
+                  "expanded": false,
+                  "items": ["devices[].debug"]
                 }
               ]
             }

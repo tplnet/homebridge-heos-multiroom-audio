@@ -76,19 +76,30 @@ export class LoggerPrefixWrapper {
   private readonly logger: Logger;
   public readonly prefix: string | undefined;
   public readonly additionalPrefix: string;
+  /** Debug messages are written as info messages (debug log of a single device). */
+  public readonly debugAsInfo: boolean;
 
-  constructor(logger: Logger, additionalPrefix: string) {
+  constructor(logger: Logger, additionalPrefix: string, debugAsInfo = false) {
     this.logger = logger;
     this.prefix = logger.prefix;
     this.additionalPrefix = additionalPrefix;
+    this.debugAsInfo = debugAsInfo;
   }
 
   log(level: LogLevel, message: string, ...parameters: any[]): void {
+    if (level === LogLevel.DEBUG && this.debugAsInfo) {
+      this.debug(message, ...parameters);
+      return;
+    }
     const fullMessage = `[${this.additionalPrefix}] ${message}`;
     this.logger.log(level, fullMessage, ...parameters);
   }
 
   debug(message: string, ...parameters: any[]): void {
+    if (this.debugAsInfo) {
+      this.logger.info(`[${this.additionalPrefix}] [debug] ${message}`, ...parameters);
+      return;
+    }
     const fullMessage = `[${this.additionalPrefix}] ${message}`;
     this.logger.debug(fullMessage, ...parameters);
   }

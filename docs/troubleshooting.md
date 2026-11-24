@@ -45,7 +45,9 @@ Add its serial number to `excludedSerialNumbers` and restart Homebridge. Then re
 
 ## Debug log
 
-Enable debug logging for the child bridge of this plugin (Homebridge UI → *Plugins* → ⋮ on this plugin → *Child Bridge Config* → *Debug Mode*, then restart the child bridge), or for the whole Homebridge, or set `consoleLogEnabled`. The debug log shows every command sent to the devices and every answer, the supported protocols of each discovered device and the inputs, favorites and Quick Select slots it reports.
+**For a single device:** switch on *Debug log* in the device entry of the plugin settings (section *Troubleshooting*), save and restart the plugin. All commands sent to this device and its answers (HEOS and AVR Control) then appear in the normal log, marked with `[debug]`, together with the supported protocols, inputs, HEOS favorites and Quick Select slots the device reports at startup. The other devices and the Debug Mode of Homebridge are not affected. Switch it off again when you are done. Only for devices with an entry in the settings (automatically added devices: use the child bridge debug mode below).
+
+**For all devices:** enable debug logging for the child bridge of this plugin (Homebridge UI → *Plugins* → ⋮ on this plugin → *Child Bridge Config* → *Debug Mode*, then restart the child bridge), or for the whole Homebridge, or set `consoleLogEnabled`. The debug log shows every command sent to the devices and every answer, the supported protocols of each discovered device and the inputs, favorites and Quick Select slots it reports.
 
 ## Reporting a problem
 

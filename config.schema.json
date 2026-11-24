@@ -117,6 +117,12 @@
               "maximum": 6,
               "default": 0
             },
+            "debug": {
+              "title": "Debug Log",
+              "description": "Writes all commands and answers of this device (HEOS and AVR Control) and what it reports at startup (protocols, inputs, favorites, Quick Select slots) to the normal log. The Debug Mode of Homebridge or the child bridge isn't needed. Only for troubleshooting: switch it off again afterwards.",
+              "type": "boolean",
+              "default": false
+            },
             "inputs": {
               "title": "Inputs",
               "description": "The list of inputs to your device. If you configure inputs here, those inputs will become selectable in the Home app.",
@@ -323,6 +329,13 @@
                       "listItems": 0
                     }
                   ]
+                },
+                {
+                  "type": "section",
+                  "title": "Troubleshooting",
+                  "expandable": true,
+                  "expanded": false,
+                  "items": ["devices[].debug"]
                 }
               ]
             }

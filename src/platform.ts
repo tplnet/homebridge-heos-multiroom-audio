@@ -318,12 +318,18 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
     deviceConfig: DeviceConfig,
     knownSupportedModes?: DenonProtocol.ControlMode[],
   ): Promise<DeviceConfig> {
+    const deviceLog = deviceConfig.debug === true ? new CustomLogging.LoggerPrefixWrapper(this.log, deviceConfig.name, true) : undefined;
     const supportedModes =
       knownSupportedModes ??
       (await DenonProtocol.checkProtocolSupport(
         deviceConfig.ip,
-        this.log.debug.bind(this.log),
+        deviceLog ? deviceLog.debug.bind(deviceLog) : this.log.debug.bind(this.log),
       ));
+    if (deviceLog) {
+      deviceLog.info(
+        `Protocols supported by the device (${deviceConfig.ip}): ${supportedModes.map((mode) => DenonProtocol.ControlMode[mode]).join(", ") || "none (not reachable)"}`,
+      );
+    }
     const result = checkControlProtocol(
       deviceConfig.name,
       deviceConfig.controlProtocol,

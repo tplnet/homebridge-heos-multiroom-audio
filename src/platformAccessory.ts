@@ -48,6 +48,8 @@ export class DenonAudioAccessory {
   private readonly configuredInputs: InputConfig[];
   private powerOnFavorite = 0;
   private powerOnQuickSelect = 0;
+  /** Debug log of this device (config option "debug"). */
+  private readonly debugLog: boolean;
   private configuredInputsByIdentifier: Map<number, ConfiguredInput> = new Map();
   private configuredInputsByInputId: Map<string, ConfiguredInput> = new Map();
   private unknownInput: ConfiguredInput;
@@ -68,7 +70,11 @@ export class DenonAudioAccessory {
     this.platform = platform;
     this.accessory = accessory;
     this.rawLog = log;
-    this.log = new CustomLogging.LoggerPrefixWrapper(this.rawLog, accessory.displayName);
+    this.debugLog = config.debug === true;
+    this.log = new CustomLogging.LoggerPrefixWrapper(this.rawLog, accessory.displayName, this.debugLog);
+    if (this.debugLog) {
+      this.log.info("Debug log is on for this device: commands and answers are written to the log. Switch it off in the settings when you are done.");
+    }
 
     this.name = accessory.displayName;
     this.ip = config.ip;
@@ -183,6 +189,9 @@ export class DenonAudioAccessory {
    * Only for protocols that start a favorite (HEOS CLI); problems are logged as warnings, nothing is changed.
    */
   async checkPowerOnSource() {
+    if (this.debugLog) {
+      await this.logFavoritesAndQuickSelects();
+    }
     if (!this.denonClient.setPowerOnFavorite) {
       return;
     }
@@ -210,6 +219,27 @@ export class DenonAudioAccessory {
       );
     } else {
       this.log.debug(`Switching on without a source starts HEOS favorite ${this.powerOnFavorite}: ${favorites[this.powerOnFavorite - 1]}`);
+    }
+  }
+
+  /** Debug log of a device: writes the HEOS favorites and Quick Select slots the device reports. */
+  private async logFavoritesAndQuickSelects() {
+    const describe = (names: string[]) => names.map((name, index) => `${index + 1}: ${name}`).join(", ") || "none";
+    if (this.denonClient.getFavorites) {
+      try {
+        const favorites = await this.withTimeout(this.denonClient.getFavorites(), DenonAudioAccessory.INPUT_QUERY_TIMEOUT);
+        this.log.info(`HEOS favorites reported by the device: ${describe(favorites)}`);
+      } catch (error) {
+        this.log.info(`Could not read the HEOS favorites (${error instanceof Error ? error.message : error}).`);
+      }
+    }
+    if (this.denonClient.getQuickSelects) {
+      try {
+        const slots = await this.withTimeout(this.denonClient.getQuickSelects(), DenonAudioAccessory.INPUT_QUERY_TIMEOUT);
+        this.log.info(`Quick Select slots reported by the device: ${describe(slots)}`);
+      } catch (error) {
+        this.log.info(`Could not read the Quick Select slots (${error instanceof Error ? error.message : error}).`);
+      }
     }
   }
 

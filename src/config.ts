@@ -19,4 +19,6 @@ export interface DeviceConfig {
   powerOnFavorite?: number;
   powerOnQuickSelect?: number;
   inputs?: InputConfig[];
+  /** Writes the debug messages of this device to the normal log (troubleshooting). */
+  debug?: boolean;
 }
