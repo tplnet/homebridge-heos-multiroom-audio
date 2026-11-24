@@ -2,6 +2,29 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.1.0 (2026-11-24)
+
+Combines 2.0.1-beta.1 to 2.0.1-beta.6, 2.1.0-beta.1 and 2.1.0-beta.2.
+
+### Added
+
+- **Debug log per device:** new option *Debug log* in the device entry (settings form: section *Troubleshooting*, config: `debug`). All commands and answers of this one device (HEOS and AVR Control) are written to the normal log and the *Plugin Logs* window, marked with `[debug]`, without the Debug Mode of Homebridge or the child bridge. At startup the plugin also logs the protocols the device supports and the inputs, HEOS favorites and Quick Select slots it reports. See [Debug log](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/troubleshooting.md#debug-log).
+
+### Changed
+
+- **Hybrid: switching on continues the music**, like HEOS CLI: the last HEOS music source (Spotify, radio, AirPlay …) continues; if there is nothing to resume, the *Power On Favorite* / *Power On Quick Select* slot is started. If the receiver is on an input (TV, HDMI, optical, Apple TV …), it is only switched on – a receiver last used for TV doesn't start music. The input is read from the receiver itself via AVR Control (`SI?`), because HEOS doesn't notice an input changed with the receiver's remote.
+- Settings form and documentation: *Power On Favorite* and *Power On Quick Select* apply to HEOS CLI and Hybrid; [Choosing a control protocol](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#choosing-a-control-protocol) explains what the tile in the Home app means (HEOS CLI: playing; Hybrid: switched on, also while paused) – important for automations that follow the device.
+- A device that isn't reachable (e.g. switched off at the mains) no longer floods the log: one warning (`The device is not reachable … Apple Home shows "No Response" until it is back`) and an info when it is back. Details are in the debug log.
+- Log lines of a device no longer repeat its name; the playing position HEOS reports every second is not written to the debug log.
+
+### Fixed
+
+- Switching on a HEOS CLI or Hybrid device with nothing to resume: the plugin checks that the favorite / Quick Select slot actually starts playing and tries a second time if not (a Denon Home Amp idle for several days confirmed the first start but stayed silent).
+- Hybrid: the Home app showed the last HEOS music source (e.g. *TuneIn*) as current input although the receiver was on another input (e.g. Apple TV). The current input now comes from the receiver; only for HEOS music the exact source comes from HEOS.
+- If a device wasn't reachable at startup, its inputs are read as soon as it answers (until now the list stayed empty until the next restart).
+- A speaker that was just switched on at the mains reports no source yet; this is no longer logged as an error ("Payload does not include sid").
+- Spelling in log messages ("occurred").
+
 ## 2.1.0-beta.2 (2026-11-24)
 
 ### Changed

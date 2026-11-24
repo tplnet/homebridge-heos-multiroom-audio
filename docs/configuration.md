@@ -43,7 +43,7 @@ What is started when there is nothing to resume, in this order:
 > **Requirement:** at least one favorite in the HEOS app (*Music → Favorites*, e.g. a radio station), or a Quick Select slot stored on the device and set in `powerOnQuickSelect`. Without either, a speaker that has nothing to resume can't be switched on from Apple Home.
 
 **Hybrid** uses AVR Control for power and HEOS CLI for everything else. Pick it whenever discovery reports both protocols and you want real standby.
-Switching on wakes the device and then, like HEOS CLI, continues the last music source – or starts the favorite / Quick Select slot if there is nothing to resume (since 2.0.1). If an **input** was the last source (TV, HDMI, optical, line in …), the device is only switched on: a receiver that was last used for TV doesn't start music.
+Switching on wakes the device and then, like HEOS CLI, continues the last music source – or starts the favorite / Quick Select slot if there is nothing to resume (since 2.1.0). If an **input** was the last source (TV, HDMI, optical, line in …), the device is only switched on: a receiver that was last used for TV doesn't start music.
 
 **Wrong protocol?** At startup the plugin checks which protocols the device supports. If the configured one isn't supported (e.g. *Hybrid* on a Denon Home 150), it uses a supported one instead and logs a warning:
 `"Office Speaker" doesn't support AVR Control (port 23 closed), so "Hybrid" can't be used. Using "HEOS CLI" instead – please change "Control Protocol" in the plugin settings.`
