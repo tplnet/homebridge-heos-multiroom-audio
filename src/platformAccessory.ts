@@ -189,9 +189,32 @@ export class DenonAudioAccessory {
    * Only for protocols that start a favorite (HEOS CLI); problems are logged as warnings, nothing is changed.
    */
   async checkPowerOnSource() {
-    if (this.debugLog) {
-      await this.logFavoritesAndQuickSelects();
+    try {
+      if (this.debugLog) {
+        await this.logFavoritesAndQuickSelects();
+      }
+      await this.checkPowerOnFavoriteOrQuickSelect();
+    } finally {
+      this.favoritesRead = undefined;
+      this.quickSelectsRead = undefined;
     }
+  }
+
+  /** Favorites / Quick Select slots read once per check (the debug log and the check use the same answer). */
+  private favoritesRead: Promise<string[]> | undefined;
+  private quickSelectsRead: Promise<string[]> | undefined;
+
+  private readFavorites(): Promise<string[]> {
+    this.favoritesRead ??= this.withTimeout(this.denonClient.getFavorites!(), DenonAudioAccessory.INPUT_QUERY_TIMEOUT);
+    return this.favoritesRead;
+  }
+
+  private readQuickSelects(): Promise<string[]> {
+    this.quickSelectsRead ??= this.withTimeout(this.denonClient.getQuickSelects!(), DenonAudioAccessory.INPUT_QUERY_TIMEOUT);
+    return this.quickSelectsRead;
+  }
+
+  private async checkPowerOnFavoriteOrQuickSelect() {
     if (!this.denonClient.setPowerOnFavorite) {
       return;
     }
@@ -204,7 +227,7 @@ export class DenonAudioAccessory {
     }
     let favorites: string[];
     try {
-      favorites = await this.withTimeout(this.denonClient.getFavorites(), DenonAudioAccessory.INPUT_QUERY_TIMEOUT);
+      favorites = await this.readFavorites();
     } catch (error) {
       this.log.debug(`Could not read the HEOS favorites (${error instanceof Error ? error.message : error}).`);
       return;
@@ -227,7 +250,7 @@ export class DenonAudioAccessory {
     const describe = (names: string[]) => names.map((name, index) => `${index + 1}: ${name}`).join(", ") || "none";
     if (this.denonClient.getFavorites) {
       try {
-        const favorites = await this.withTimeout(this.denonClient.getFavorites(), DenonAudioAccessory.INPUT_QUERY_TIMEOUT);
+        const favorites = await this.readFavorites();
         this.log.info(`HEOS favorites reported by the device: ${describe(favorites)}`);
       } catch (error) {
         this.log.info(`Could not read the HEOS favorites (${error instanceof Error ? error.message : error}).`);
@@ -235,7 +258,7 @@ export class DenonAudioAccessory {
     }
     if (this.denonClient.getQuickSelects) {
       try {
-        const slots = await this.withTimeout(this.denonClient.getQuickSelects(), DenonAudioAccessory.INPUT_QUERY_TIMEOUT);
+        const slots = await this.readQuickSelects();
         this.log.info(`Quick Select slots reported by the device: ${describe(slots)}`);
       } catch (error) {
         this.log.info(`Could not read the Quick Select slots (${error instanceof Error ? error.message : error}).`);
@@ -250,7 +273,7 @@ export class DenonAudioAccessory {
     }
     let slots: string[];
     try {
-      slots = await this.withTimeout(this.denonClient.getQuickSelects(), DenonAudioAccessory.INPUT_QUERY_TIMEOUT);
+      slots = await this.readQuickSelects();
     } catch (error) {
       this.log.debug(`Could not read the Quick Select slots (${error instanceof Error ? error.message : error}).`);
       return;
@@ -436,7 +459,7 @@ export class DenonAudioAccessory {
         }
       }
     } catch (error) {
-      this.log.debug(`Could not fetch the device description of ${this.name}:`, error);
+      this.log.debug(`Could not fetch the device description:`, error);
     }
   }
 
@@ -446,7 +469,7 @@ export class DenonAudioAccessory {
    */
   async getActive(): Promise<CharacteristicValue> {
     if (this.pendingActive && Date.now() < this.pendingActive.until) {
-      this.log.debug(`getActive for ${this.name}. [recently set to ${this.pendingActive.value}]`);
+      this.log.debug(`getActive. [recently set to ${this.pendingActive.value}]`);
       return this.pendingActive.value;
     }
     this.pendingActive = undefined;
@@ -477,7 +500,7 @@ export class DenonAudioAccessory {
 
   async getTargetMediaState(): Promise<CharacteristicValue> {
     if (this.targetMediaState !== undefined) {
-      this.log.debug(`getTargetMediaState for ${this.name}. [retrieving from cache]`);
+      this.log.debug(`getTargetMediaState. [retrieving from cache]`);
       return this.playingToTargetMediaState(this.targetMediaState);
     }
     return this.playingToTargetMediaState(await this.getPlaying());
@@ -511,7 +534,7 @@ export class DenonAudioAccessory {
    */
   private async queryDevice<T>(operation: string, description: string, request: (raceStatus: RaceStatus) => Promise<T>): Promise<T> {
     const raceStatus = new RaceStatus();
-    this.log.debug(`${operation} for ${this.name}. [race id: ${raceStatus.raceId}]`);
+    this.log.debug(`${operation}. [race id: ${raceStatus.raceId}]`);
 
     let timer: NodeJS.Timeout | undefined;
     try {
@@ -530,11 +553,11 @@ export class DenonAudioAccessory {
       if (DenonAudioAccessory.isConnectionError(error)) {
         this.markUnreachable(error as Error, `${operation}() [race id: ${raceStatus.raceId}]`);
       } else if (error instanceof PromiseTimeoutException) {
-        this.log.debug(`${this.name} lost its promise race for ${operation}(). [race id: ${raceStatus.raceId}]`);
+        this.log.debug(`Lost its promise race for ${operation}(). [race id: ${raceStatus.raceId}]`);
       } else if (error instanceof ResponseTimeoutException) {
-        this.log.debug(`${this.name} response timed out for ${operation}(). [race id: ${raceStatus.raceId}]`, error);
+        this.log.debug(`Response timed out for ${operation}(). [race id: ${raceStatus.raceId}]`, error);
       } else {
-        this.log.error(`An error occurred while getting ${description} for ${this.name}. [race id: ${raceStatus.raceId}]`, error);
+        this.log.error(`An error occurred while getting ${description}. [race id: ${raceStatus.raceId}]`, error);
       }
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
@@ -551,7 +574,7 @@ export class DenonAudioAccessory {
   }
 
   async setActive(newValue: CharacteristicValue) {
-    this.log.debug(`setActive for ${this.name} set to ${newValue}`);
+    this.log.debug(`setActive set to ${newValue}`);
     const active = newValue === this.platform.Characteristic.Active.ACTIVE;
     // Report the requested state right away: switching on can take a few seconds (e.g. when the power on favorite is
     // started), and the device reports intermediate states during that time.
@@ -566,7 +589,7 @@ export class DenonAudioAccessory {
       })
       .catch(async (error) => {
         this.pendingActive = undefined;
-        this.log.error(`An error occurred while setting power status for ${this.name}.`, error);
+        this.log.error(`An error occurred while setting power status.`, error);
         // show the real state again
         const deviceState = await this.denonClient.getPower().catch(() => !active);
         this.tvService.updateCharacteristic(this.platform.Characteristic.Active, deviceState);
@@ -577,17 +600,17 @@ export class DenonAudioAccessory {
   }
 
   async setActiveIdentifier(newValue: CharacteristicValue) {
-    this.log.debug(`setActiveIdentifier for ${this.name} set to ${newValue}`);
+    this.log.debug(`setActiveIdentifier set to ${newValue}`);
 
     if (!this.configuredInputsByIdentifier.has(newValue as number)) {
-      this.log.error(`An error occurred while setting input for ${this.name}. Input identifier ${newValue} is not configured.`);
+      this.log.error(`An error occurred while setting input. Input identifier ${newValue} is not configured.`);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.NOT_ALLOWED_IN_CURRENT_STATE);
     }
 
     try {
       await this.denonClient.setInput(this.configuredInputsByIdentifier.get(newValue as number)!.inputID);
     } catch (error) {
-      this.log.error(`An error occurred while setting input for ${this.name}.`, error);
+      this.log.error(`An error occurred while setting input.`, error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
@@ -649,7 +672,7 @@ export class DenonAudioAccessory {
   }
 
   async setTargetMediaState(newValue: CharacteristicValue) {
-    this.log.debug(`setTargetMediaState for ${this.name} set to ${newValue}`);
+    this.log.debug(`setTargetMediaState set to ${newValue}`);
 
     let target: Playing;
     switch (newValue) {
@@ -663,12 +686,12 @@ export class DenonAudioAccessory {
         target = Playing.STOP;
         break;
       default:
-        this.log.warn(`Unexpected target media state for ${this.name}: ${newValue}`);
+        this.log.warn(`Unexpected target media state: ${newValue}`);
         throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.INVALID_VALUE_IN_REQUEST);
     }
 
     if (this.playingChangeOngoing) {
-      this.log.debug(`setTargetMediaState for ${this.name} was called while another play state change is still ongoing. Ignoring this call.`);
+      this.log.debug(`setTargetMediaState was called while another play state change is still ongoing. Ignoring this call.`);
       return;
     }
 
@@ -677,7 +700,7 @@ export class DenonAudioAccessory {
       this.targetMediaState = target;
       await this.denonClient.setPlaying(target);
     } catch (error) {
-      this.log.error(`An error occurred while setting the play state for ${this.name}.`, error);
+      this.log.error(`An error occurred while setting the play state.`, error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
       this.targetMediaState = undefined;
@@ -686,9 +709,9 @@ export class DenonAudioAccessory {
   }
 
   async setPlayPauseToggle() {
-    this.log.debug(`setPlayPauseToggle for ${this.name}`);
+    this.log.debug(`setPlayPauseToggle`);
     if (this.playingChangeOngoing) {
-      this.log.debug(`setPlayPauseToggle for ${this.name} was called while another play state change is still ongoing. Ignoring this call.`);
+      this.log.debug(`setPlayPauseToggle was called while another play state change is still ongoing. Ignoring this call.`);
       return;
     }
 
@@ -708,7 +731,7 @@ export class DenonAudioAccessory {
       }
       await this.denonClient.setPlaying(this.targetMediaState);
     } catch (error) {
-      this.log.error(`An error occurred while toggling play/pause for ${this.name}.`, error);
+      this.log.error(`An error occurred while toggling play/pause.`, error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
       this.targetMediaState = undefined;
@@ -717,7 +740,7 @@ export class DenonAudioAccessory {
   }
 
   async setPlayNext() {
-    this.log.debug(`setPlayNext for ${this.name}`);
+    this.log.debug(`setPlayNext`);
     try {
       await this.denonClient.setPlayNext();
     } catch (error) {
@@ -726,13 +749,13 @@ export class DenonAudioAccessory {
         this.log.info(`The current source doesn't support skipping to the next track (e.g. a radio station or an input).`);
         return;
       }
-      this.log.error(`An error occurred while setting play next for ${this.name}.`, error);
+      this.log.error(`An error occurred while setting play next.`, error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
 
   async setPlayPrevious() {
-    this.log.debug(`setPlayPrevious for ${this.name}`);
+    this.log.debug(`setPlayPrevious`);
     try {
       await this.denonClient.setPlayPrevious();
     } catch (error) {
@@ -741,25 +764,25 @@ export class DenonAudioAccessory {
         this.log.info(`The current source doesn't support skipping to the previous track (e.g. a radio station or an input).`);
         return;
       }
-      this.log.error(`An error occurred while setting play previous for ${this.name}.`, error);
+      this.log.error(`An error occurred while setting play previous.`, error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
 
   async setMute(newValue: CharacteristicValue) {
-    this.log.debug(`setMute for ${this.name} set to ${newValue}`);
+    this.log.debug(`setMute set to ${newValue}`);
     try {
       await this.denonClient.setMute(newValue as boolean);
     } catch (error) {
-      this.log.error(`An error occurred while setting mute status for ${this.name}.`, error);
+      this.log.error(`An error occurred while setting mute status.`, error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
 
   async setVolume(newValue: CharacteristicValue) {
-    this.log.debug(`setVolume for ${this.name} set to ${newValue}`);
+    this.log.debug(`setVolume set to ${newValue}`);
     if (this.volumeChangeOngoing) {
-      this.log.debug(`setVolume for ${this.name} was called while another volume change is still ongoing. Ignoring this call.`);
+      this.log.debug(`setVolume was called while another volume change is still ongoing. Ignoring this call.`);
       return;
     }
 
@@ -768,7 +791,7 @@ export class DenonAudioAccessory {
       this.lastSetVolume = newValue as number;
       await this.denonClient.setVolume(toDeviceVolume(newValue as number, this.volumeLimit));
     } catch (error) {
-      this.log.error(`An error occurred while setting volume for ${this.name}.`, error);
+      this.log.error(`An error occurred while setting volume.`, error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
       this.volumeChangeOngoing = false;
@@ -777,13 +800,13 @@ export class DenonAudioAccessory {
 
   async setVolumeSelector(direction: CharacteristicValue) {
     if (this.volumeChangeOngoing) {
-      this.log.debug(`setVolumeSelector for ${this.name} was called while another volume change is still ongoing. Ignoring this call.`);
+      this.log.debug(`setVolumeSelector was called while another volume change is still ongoing. Ignoring this call.`);
       return;
     }
 
     try {
       this.volumeChangeOngoing = true;
-      this.log.debug(`setVolumeSelector for ${this.name} set to ${direction}`);
+      this.log.debug(`setVolumeSelector set to ${direction}`);
       if (direction === this.platform.Characteristic.VolumeSelector.INCREMENT) {
         if (this.volumeLimit !== undefined) {
           const headroom = this.volumeLimit - (await this.denonClient.getVolume());
@@ -798,7 +821,7 @@ export class DenonAudioAccessory {
         await this.denonClient.setVolumeDown(this.volumeStepSize);
       }
     } catch (error) {
-      this.log.error(`An error occurred while changing the volume for ${this.name}.`, error);
+      this.log.error(`An error occurred while changing the volume.`, error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
       this.volumeChangeOngoing = false;
@@ -810,7 +833,7 @@ export class DenonAudioAccessory {
    */
   private callbackActive(active: boolean) {
     if (this.powerChangeInProgress && this.pendingActive && this.pendingActive.value !== active) {
-      this.log.debug(`Ignoring intermediate power state ${active} of ${this.name} while switching.`);
+      this.log.debug(`Ignoring intermediate power state ${active} while switching.`);
       return;
     }
     if (this.pendingActive && this.pendingActive.value !== active) {

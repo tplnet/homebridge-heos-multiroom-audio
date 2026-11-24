@@ -122,7 +122,7 @@ Note: HEOS player ids can be negative (Dining Room, Garage, Kids Room). Control 
 - [x] *Power On Quick Select* slot 5 on a Denon Home 150 is reported as missing at startup (the device reports 3 slots) (1.4.0).
 - [x] The Quick Select command (`player/play_quickselect`) is accepted by a Denon Home 150 (`result: success`) (1.4.0).
 - [ ] *Power On Quick Select* on a Denon Home 150: switching on with nothing to resume starts the slot (log: `starting Quick Select …`). Hard to trigger: the speaker keeps the last source even after a power cut, and an ended Spotify Connect session is still resumed (1.4.0).
-- [ ] *Debug log* of one device (2.1.0-beta.1): the option is in the device entry under *Troubleshooting* (German form: *Fehlersuche* → *Debug-Log*); after saving and restarting, commands and answers of that device appear in the normal log and in *Plugin Logs* with `[debug]`, plus protocols, inputs, favorites and Quick Select slots at startup; the other devices log as before; no line every second while music plays; switched off, the `[debug]` lines are gone.
+- [x] *Debug log* of one device (2.1.0-beta.1, Home Amp on Hybrid): the option is in the device entry under *Troubleshooting* (German form: *Fehlersuche* → *Debug-Log*); after saving and restarting, commands and answers of that device appear in the normal log and in *Plugin Logs* with `[debug]`, plus protocols, inputs, favorites and Quick Select slots at startup; the other devices log as before; no line every second while music plays; switched off, the `[debug]` lines are gone.
 
 ## Reporting
 

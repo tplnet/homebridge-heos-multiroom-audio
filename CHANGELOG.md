@@ -2,6 +2,14 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.1.0-beta.2 (2026-11-24)
+
+### Changed
+
+- Debug log per device: the HEOS favorites are read only once at startup (the debug output and the check of *Power On Favorite* / *Power On Quick Select* share the answer).
+- Log lines of a device no longer repeat its name (e.g. `[Kitchen] getActive.` instead of `[Kitchen] getActive for Kitchen.`).
+- The protocol check of a device with *Debug log* is logged with the device name only (without `[Platform]` in front).
+
 ## 2.1.0-beta.1 (2026-11-24)
 
 Contains all fixes of 2.0.1-beta.1 to 2.0.1-beta.6 (there is no 2.0.1 release).

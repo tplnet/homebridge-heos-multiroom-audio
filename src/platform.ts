@@ -318,7 +318,7 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
     deviceConfig: DeviceConfig,
     knownSupportedModes?: DenonProtocol.ControlMode[],
   ): Promise<DeviceConfig> {
-    const deviceLog = deviceConfig.debug === true ? new CustomLogging.LoggerPrefixWrapper(this.log, deviceConfig.name, true) : undefined;
+    const deviceLog = deviceConfig.debug === true ? new CustomLogging.LoggerPrefixWrapper(this.rawLog, deviceConfig.name, true) : undefined;
     const supportedModes =
       knownSupportedModes ??
       (await DenonProtocol.checkProtocolSupport(

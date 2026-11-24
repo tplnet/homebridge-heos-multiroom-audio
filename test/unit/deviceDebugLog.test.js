@@ -75,6 +75,30 @@ describe("debug log per device", () => {
     assert.ok(logs.info.some((m) => m.includes("Quick Select slots reported by the device: 1: Radio, 2: TV")));
   });
 
+  it("reads the favorites only once at startup (debug output and check share the answer)", async () => {
+    const { handler, logs } = createAccessory(true, "Once Speaker");
+    let calls = 0;
+    handler.denonClient = {
+      setPowerOnFavorite() {},
+      getFavorites: async () => {
+        calls++;
+        return ["Radio One"];
+      },
+      getQuickSelects: async () => [],
+    };
+    await handler.checkPowerOnSource();
+    assert.equal(calls, 1);
+    assert.ok(logs.info.some((m) => m.includes("starts HEOS favorite 1: Radio One")));
+    await handler.checkPowerOnSource();
+    assert.equal(calls, 2, "a later check reads them again");
+  });
+
+  it("doesn't repeat the device name in its lines", () => {
+    const source = fs.readFileSync(new URL("../../src/platformAccessory.ts", import.meta.url), "utf8");
+    const repeated = source.split("\n").filter((line) => /this\.log\.\w+\(/.test(line) && line.includes("${this.name}"));
+    assert.deepEqual(repeated, []);
+  });
+
   it("is an option of the device entry in all languages, off by default", () => {
     for (const file of ["../../config.schema.json", "../../schemas/config.schema.de.json"]) {
       const schema = JSON.parse(fs.readFileSync(new URL(file, import.meta.url), "utf8"));
