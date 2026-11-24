@@ -111,6 +111,8 @@ fs.symlinkSync(repoDir, path.join(pluginRoot, pkg.name), "dir");
 const devices = [
   { name: "Smoke HEOS", serialNumber: "SMOKE-HEOS", ip: "127.0.0.1", controlProtocol: "HEOSCLI", inputs: [{ inputID: "aux_in_1", name: "AUX" }] },
   { name: "Smoke Invalid", serialNumber: "SMOKE-INVALID", ip: "127.0.0.1", controlProtocol: "INVALID" },
+  // the entry the Homebridge settings form saves on a fresh install (only default values)
+  { volumeLimitEnabled: false, volumeLimit: 99, volumeStepSize: 2, powerOnFavorite: 1, powerOnQuickSelect: 0, debug: false, inputs: [{ showInList: true }] },
 ];
 if (avrAvailable) {
   devices.push({ name: "Smoke Hybrid", serialNumber: "SMOKE-HYBRID", ip: "127.0.0.1", controlProtocol: "HYBRID", volumeLimitEnabled: true, volumeLimit: 50 });
@@ -155,6 +157,7 @@ const checks = [
   ["plugin loaded", output.includes(`Loaded plugin: ${pkg.name}@${pkg.version}`)],
   [`${expectedAccessories} accessories published`, (output.match(/Publishing external accessory/g) ?? []).length === expectedAccessories],
   ["invalid device skipped with a clear message", output.includes("Could not set up device 'Smoke Invalid'")],
+  ["empty device entry of the settings form ignored", output.includes("Ignoring an empty device entry") && !output.includes("'undefined'")],
   ["connected to the HEOS device", output.includes("[Smoke HEOS] New connection established.")],
   ["inputs read from the device (negative player id)", output.includes("[Smoke HEOS] Inputs reported by the device: AUX In (aux_in_1)")],
   ["no HAP-NodeJS warnings", !output.includes("HAP-NodeJS WARNING")],

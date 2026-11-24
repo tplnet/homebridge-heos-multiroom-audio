@@ -38,7 +38,7 @@
       },
       "devices": {
         "title": "Devices",
-        "description": "Devices you add here are set up with exactly these settings. Devices that are added automatically don't need an entry; add one only to change their settings (same serial number).",
+        "description": "Devices you add here are set up with exactly these settings. Devices that are added automatically don't need an entry; add one only to change their settings (same serial number). Name, serial number, IP address and control protocol are required; an entry without name, serial number and IP address is ignored (the settings form starts with such an empty entry).",
         "type": "array",
         "orderable": false,
         "items": {
@@ -231,7 +231,10 @@
               }
             }
           },
-          "required": ["name", "serialNumber", "ip", "controlProtocol"]
+          "anyOf": [
+            { "required": ["name", "serialNumber", "ip", "controlProtocol"] },
+            { "not": { "anyOf": [{ "required": ["name"] }, { "required": ["serialNumber"] }, { "required": ["ip"] }] } }
+          ]
         }
       },
       "consoleLogEnabled": {

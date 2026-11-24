@@ -199,13 +199,15 @@ describe("Homebridge verification checks", () => {
     assert.deepEqual(booleans, []);
   });
 
-  it("a device entry requires name, serial number, IP address and protocol", () => {
+  it("a device entry requires name, serial number, IP address and protocol, unless it is empty", () => {
+    // A plain `required` list makes the empty entry the Homebridge UI shows on a fresh install invalid
+    // ("Config Validation Failed", the form can't be saved). anyOf: complete, or none of name / serial / IP.
     for (const [file, json] of schemas) {
-      assert.deepEqual(
-        json.schema.properties.devices.items.required,
-        ["name", "serialNumber", "ip", "controlProtocol"],
-        file,
-      );
+      const items = json.schema.properties.devices.items;
+      assert.equal(items.required, undefined, file);
+      assert.deepEqual(items.anyOf[0].required, ["name", "serialNumber", "ip", "controlProtocol"], file);
+      const empty = items.anyOf[1].not.anyOf.map((s) => s.required[0]);
+      assert.deepEqual(empty, ["name", "serialNumber", "ip"], file);
     }
   });
 

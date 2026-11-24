@@ -38,7 +38,7 @@
       },
       "devices": {
         "title": "Geräte",
-        "description": "Hier eingetragene Geräte werden genau mit diesen Einstellungen eingerichtet. Automatisch hinzugefügte Geräte brauchen keinen Eintrag; trage sie nur ein, um ihre Einstellungen zu ändern (gleiche Seriennummer).",
+        "description": "Hier eingetragene Geräte werden genau mit diesen Einstellungen eingerichtet. Automatisch hinzugefügte Geräte brauchen keinen Eintrag; trage sie nur ein, um ihre Einstellungen zu ändern (gleiche Seriennummer). Name, Seriennummer, IP-Adresse und Steuerprotokoll sind Pflicht; ein Eintrag ohne Name, Seriennummer und IP-Adresse wird ignoriert (das Formular beginnt mit einem solchen leeren Eintrag).",
         "type": "array",
         "orderable": false,
         "items": {
@@ -231,7 +231,10 @@
               }
             }
           },
-          "required": ["name", "serialNumber", "ip", "controlProtocol"]
+          "anyOf": [
+            { "required": ["name", "serialNumber", "ip", "controlProtocol"] },
+            { "not": { "anyOf": [{ "required": ["name"] }, { "required": ["serialNumber"] }, { "required": ["ip"] }] } }
+          ]
         }
       },
       "consoleLogEnabled": {

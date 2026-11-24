@@ -2,6 +2,17 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.1.1-beta.1 (2026-11-24)
+
+### Fixed
+
+- **Fresh installation: the settings form showed "Config Validation Failed" and couldn't be saved** (since 1.5.2). The Homebridge UI starts the form with one empty device entry, and the required fields of a device entry (declared as a list since 1.5.2 for the Homebridge verification) made this empty entry invalid. Now name, serial number, IP address and control protocol are only required once one of name, serial number or IP address is filled in; a half-filled entry still can't be saved. Existing configurations were not affected.
+- The plugin ignores a device entry without name, serial number and IP address (the empty entry the settings form saves) instead of reporting it as a misconfigured device.
+
+### Changed
+
+- Settings form: the device fields are no longer marked with `*`; the description of *Devices* names the required fields.
+
 ## 2.1.0 (2026-11-24)
 
 Combines 2.0.1-beta.1 to 2.0.1-beta.6, 2.1.0-beta.1 and 2.1.0-beta.2.

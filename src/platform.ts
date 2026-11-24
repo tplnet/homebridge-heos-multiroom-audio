@@ -12,7 +12,7 @@ import { DenonAudioAccessory as DenonAudioAccessory } from "./platformAccessory.
 import * as CustomLogging from "./customLogging.js";
 import { LEGACY_PLATFORM_NAME, PLATFORM_NAME, PLUGIN_NAME } from "./settings.js";
 import * as DenonProtocol from "./denonProtocol.js";
-import type { DeviceConfig } from "./config.js";
+import { isEmptyDeviceEntry, type DeviceConfig } from "./config.js";
 import { buildDiscoveredDeviceConfig } from "./discovery.js";
 import { checkControlProtocol } from "./protocolCheck.js";
 import { DiscoveredHeosDevice, HeosDiscovery } from "./heosDiscovery.js";
@@ -153,6 +153,10 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
     // loop over the configured devices and publish each one
     if (this.config.devices) {
       for (const deviceConfig of this.config.devices as DeviceConfig[]) {
+        if (isEmptyDeviceEntry(deviceConfig)) {
+          this.log.debug("Ignoring an empty device entry (no name, serial number or IP address).");
+          continue;
+        }
         if (this.activeSerialNumbers.has(deviceConfig.serialNumber)) {
           this.log.warn(
             `Device with serial number ${deviceConfig.serialNumber} is configured more than once. Skipping '${deviceConfig.name}'.`,
