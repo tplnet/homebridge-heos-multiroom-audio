@@ -18,12 +18,7 @@ Publishing a new version: see [releasing.md](releasing.md).
 
 Run all checks locally with `npm run check` (runtime `npm audit`, lint, unit tests, smoke test). To test another Homebridge version, install it temporarily with `npm install --no-save homebridge@<version>`.
 
-Upstream changes from the original project can be merged with:
-
-```bash
-git remote add upstream https://github.com/hov3rcraft/homebridge-denon-heos-audio.git
-git fetch upstream && git merge upstream/main
-```
+The project started from [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) (see the README) and has been developed independently since. Changes of the original project are not merged; if one is useful, port it by hand.
 
 ## Protocol specifications
 
