@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
+All notable changes of this project.
 
 ## 2.2.0-beta.1 (2026-11-26)
 
