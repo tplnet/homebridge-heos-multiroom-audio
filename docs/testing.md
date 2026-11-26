@@ -39,6 +39,9 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 
 - [x] Every device is listed in the log with the correct name, model, serial number and IP address.
 - [x] The listed supported modes are plausible (Denon Home 150 / 250: `HEOSCLI`; Home Amp and Cinema 60: `AVRCONTROL, HEOSCLI`).
+- [ ] Fresh settings form (2.2.0): *Device Discovery* is off, *Add Discovered Devices Automatically* and *Excluded Devices* are hidden; switching on Device Discovery shows *Add Discovered Devices Automatically*, switching that on shows *Excluded Devices*.
+- [ ] With Device Discovery off, manually configured devices start normally and the log shows no device overview.
+- [ ] `"deviceDiscovery": false` with `"autoAddDiscoveredDevices": true`: warning in the log, no device is added automatically.
 
 ## 2. Automatic setup
 

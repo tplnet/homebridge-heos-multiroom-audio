@@ -177,6 +177,12 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
       }
     }
 
+    if (this.config.autoAddDiscoveredDevices === true && !this.discoveryEnabled()) {
+      this.log.warn(
+        "'Add Discovered Devices Automatically' is on, but 'Device Discovery' is off: no devices are added automatically. Turn on Device Discovery to use it.",
+      );
+    }
+
     if (this.discoveryEnabled()) {
       this.scheduleOverview(OVERVIEW_FIRST_DELAY_MS);
       this.initialWindowTimer = setTimeout(
@@ -245,8 +251,16 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
     }
   }
 
+  /**
+   * Device discovery runs if it is switched on. A configuration that only sets `autoAddDiscoveredDevices`
+   * (no `deviceDiscovery` at all, e.g. written by hand) still gets the discovery, as before 2.2.0.
+   * If discovery is explicitly switched off, auto-add is off as well (the settings form hides it then).
+   */
   private discoveryEnabled(): boolean {
-    return this.config.deviceDiscovery === true || this.autoAddEnabled();
+    if (this.config.deviceDiscovery === undefined) {
+      return this.config.autoAddDiscoveredDevices === true;
+    }
+    return this.config.deviceDiscovery === true;
   }
 
   /** Logs the device overview after the delay (restarts the delay if called again before). */
@@ -266,7 +280,7 @@ export class DenonAudioPlatform implements DynamicPlatformPlugin {
   }
 
   private autoAddEnabled(): boolean {
-    return this.config.autoAddDiscoveredDevices === true;
+    return this.config.autoAddDiscoveredDevices === true && this.discoveryEnabled();
   }
 
   private isExcluded(serialNumber: string): boolean {

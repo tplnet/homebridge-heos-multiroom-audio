@@ -67,7 +67,7 @@ Devices that you configure manually are **never** touched by the automatic setup
 
 ### Step 1: Find your devices
 
-In the plugin settings, enable **Device Discovery** and restart Homebridge. About 30 seconds after the start, the log shows an **overview of all devices** – the ones found in the network and the manually configured ones – and whether they were added:
+In the plugin settings, enable **Device Discovery** (off by default) and restart Homebridge. About 30 seconds after the start, the log shows an **overview of all devices** – the ones found in the network and the manually configured ones – and whether they were added:
 
 ```
 [Platform] Device overview: 4 found in the network, 2 added automatically, 1 added manually, 1 not added.
@@ -89,7 +89,7 @@ With automatic setup the current address is picked up at every Homebridge start;
 
 ### Step 3a: Automatic setup
 
-Enable **Add Discovered Devices Automatically** in the plugin settings (or set `"autoAddDiscoveredDevices": true`) and restart Homebridge. Each discovered device is added with:
+Enable **Add Discovered Devices Automatically** in the plugin settings (or set `"autoAddDiscoveredDevices": true`) and restart Homebridge. The option is only shown while **Device Discovery** is on, and **Excluded Devices** only while both are on: adding devices automatically needs the discovery. If you switch off Device Discovery and save, the Homebridge UI removes both settings from the configuration, including the list of excluded devices. Each discovered device is added with:
 
 - the **name** from the HEOS app (e.g. *Patio Music*),
 - the **control protocol** `HYBRID` if the device supports both protocols, otherwise `HEOSCLI`,
@@ -145,11 +145,11 @@ See [Apple Home](apple-home.md).
 | Option | Required | Default | Description |
 | --- | --- | --- | --- |
 | `name` | no | `HEOS Multiroom-Audio` | Name of the plugin in the Homebridge log. The Homebridge UI shows the log of this plugin (*Plugins* → ⋮ → *Plugin Logs*) only with a name set. |
-| `deviceDiscovery` | no | `true` | Logs Denon / Marantz devices found in the network. |
-| `autoAddDiscoveredDevices` | no | `false` | Adds every discovered device automatically (see [automatic setup](#step-3a-automatic-setup)). Manually configured devices are not affected. |
+| `deviceDiscovery` | no | `false` | Searches the network for Denon / Marantz devices and logs the device overview. Needed for `autoAddDiscoveredDevices`; manually configured devices work without it. |
+| `autoAddDiscoveredDevices` | no | `false` | Adds every discovered device automatically (see [automatic setup](#step-3a-automatic-setup)). Manually configured devices are not affected. Only works with device discovery: with `"deviceDiscovery": false` it is ignored (warning in the log); without a `deviceDiscovery` entry the discovery runs. |
 | `excludedSerialNumbers` | no | `[]` | Serial numbers of discovered devices that should not be added automatically. |
 | `devices[].name` | yes | | Name shown in the Home app. |
-| `devices[].serialNumber` | yes | | Serial number of the device (see discovery). |
+| `devices[].serialNumber` | yes | | Serial number of the device (type label of the device, or the device overview of the discovery). |
 | `devices[].ip` | yes | | Fixed IPv4 address of the device. |
 | `devices[].controlProtocol` | yes | | `HEOSCLI`, `AVRCONTROL` or `HYBRID` (see [above](#choosing-a-control-protocol)). |
 | `devices[].volumeLimitEnabled` | no | `false` | Enables the volume limit. |

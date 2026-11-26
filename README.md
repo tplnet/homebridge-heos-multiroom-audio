@@ -56,7 +56,7 @@ Devices used for testing this fork:
 | Denon Home Amp | Streaming amplifier | Hybrid |
 | Marantz Cinema 60 | AV receiver | Hybrid |
 
-Not sure what your device supports? Turn on device discovery: the log lists every device found with the recommended protocol.
+Not sure what your device supports? Turn on **Device Discovery** (off by default): the log lists every device found with the recommended protocol.
 
 **Control protocols:** *HEOS CLI* for speakers (on/off = play/stop), *Hybrid* for AV receivers and amplifiers with HEOS (real standby), *AVR Control* for receivers without HEOS – see [Choosing a control protocol](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#choosing-a-control-protocol).
 
@@ -91,7 +91,7 @@ Running it on a [child bridge](https://github.com/homebridge/homebridge/wiki/Chi
 2. Give the devices a fixed IP address in your router (DHCP reservation).
 3. Add each device to the Home app once: **+** → **Add Accessory** → **More options…** → choose the device → enter the setup code from the log – see [Apple Home](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/apple-home.md).
 
-Devices you want to set up yourself (name, protocol, inputs, volume limit) are added under **Devices** in the settings form; they always keep their manual settings. All options: [Configuration](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md).
+Devices you want to set up yourself (name, protocol, inputs, volume limit) are added under **Devices** in the settings form; they always keep their manual settings and also work with Device Discovery switched off. All options: [Configuration](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md).
 
 ## Compatibility and security
 

@@ -2,6 +2,15 @@
 
 All notable changes of this fork. The fork is based on [hov3rcraft/homebridge-denon-heos-audio](https://github.com/hov3rcraft/homebridge-denon-heos-audio) 1.0.0-beta.1.
 
+## 2.2.0-beta.1 (2026-11-26)
+
+### Changed
+
+- **Settings form: *Device Discovery* is off by default.** Manually configured devices (*Devices*) work without it. Existing configurations keep their setting.
+- Settings form: *Add Discovered Devices Automatically* is only shown while *Device Discovery* is on, and *Excluded Devices* only while both are on – adding devices automatically needs the discovery. Note: when you switch off *Device Discovery* and save, the Homebridge UI removes these two settings from the configuration, including the list of excluded devices.
+- `"deviceDiscovery": false` now also switches off `autoAddDiscoveredDevices` (before, auto-add started the discovery anyway); the log warns about this combination. A configuration without a `deviceDiscovery` entry and with `autoAddDiscoveredDevices` keeps the discovery, as before.
+- The hint for the serial number of a device names the type label of the device and the device overview of the discovery.
+
 ## 2.1.1 (2026-11-24)
 
 Same as 2.1.1-beta.1.

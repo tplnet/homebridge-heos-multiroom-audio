@@ -14,9 +14,9 @@
       },
       "deviceDiscovery": {
         "title": "Device Discovery",
-        "description": "Enable to automatically discover Denon devices on your network. (About 30 seconds after the start, the homebridge log shows an overview of all found and configured devices. Ensure that your homebridge's log level is at least set to 'info' or enable the console log below.)",
+        "description": "Searches the network for Denon / Marantz devices. About 30 seconds after the start, the Homebridge log shows an overview of all found and configured devices (log level at least 'info', or enable the console log below). Needed for adding devices automatically. Manually configured devices under 'Devices' work without it.",
         "type": "boolean",
-        "default": true
+        "default": false
       },
       "autoAddDiscoveredDevices": {
         "title": "Add Discovered Devices Automatically",
@@ -51,7 +51,7 @@
             },
             "serialNumber": {
               "title": "Serial Number",
-              "description": "If you don't know your device's serial number, use 'device discovery' to find it.",
+              "description": "Printed on the type label of the device. Or turn on Device Discovery once: the log lists the serial number of every device found.",
               "type": "string"
             },
             "ip": {
@@ -255,13 +255,21 @@
   "layout": [
     "name",
     "deviceDiscovery",
-    "autoAddDiscoveredDevices",
+    {
+      "key": "autoAddDiscoveredDevices",
+      "condition": {
+        "functionBody": "return model.deviceDiscovery === true;"
+      }
+    },
     {
       "key": "excludedSerialNumbers",
       "type": "array",
       "orderable": false,
       "items": ["excludedSerialNumbers[]"],
-      "listItems": 0
+      "listItems": 0,
+      "condition": {
+        "functionBody": "return model.deviceDiscovery === true && model.autoAddDiscoveredDevices === true;"
+      }
     },
     {
       "type": "fieldset",

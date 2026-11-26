@@ -14,9 +14,9 @@
       },
       "deviceDiscovery": {
         "title": "Geräteerkennung",
-        "description": "Sucht automatisch nach Denon- und Marantz-Geräten im Netzwerk. Etwa 30 Sekunden nach dem Start zeigt das Homebridge-Log eine Übersicht aller gefundenen und konfigurierten Geräte (Log-Level mindestens „info“ oder unten das Konsolen-Log aktivieren).",
+        "description": "Sucht im Netzwerk nach Denon- und Marantz-Geräten. Etwa 30 Sekunden nach dem Start zeigt das Homebridge-Log eine Übersicht aller gefundenen und konfigurierten Geräte (Log-Level mindestens „info“ oder unten das Konsolen-Log aktivieren). Nötig für das automatische Hinzufügen. Manuell eingetragene Geräte unter „Geräte“ funktionieren auch ohne.",
         "type": "boolean",
-        "default": true
+        "default": false
       },
       "autoAddDiscoveredDevices": {
         "title": "Gefundene Geräte automatisch hinzufügen",
@@ -51,7 +51,7 @@
             },
             "serialNumber": {
               "title": "Seriennummer",
-              "description": "Wenn du die Seriennummer nicht kennst, aktiviere die Geräteerkennung. Sie steht dann im Log.",
+              "description": "Steht auf dem Typenschild des Geräts. Oder einmal die Geräteerkennung einschalten: Das Log zeigt die Seriennummer jedes gefundenen Geräts.",
               "type": "string"
             },
             "ip": {
@@ -255,13 +255,21 @@
   "layout": [
     "name",
     "deviceDiscovery",
-    "autoAddDiscoveredDevices",
+    {
+      "key": "autoAddDiscoveredDevices",
+      "condition": {
+        "functionBody": "return model.deviceDiscovery === true;"
+      }
+    },
     {
       "key": "excludedSerialNumbers",
       "type": "array",
       "orderable": false,
       "items": ["excludedSerialNumbers[]"],
-      "listItems": 0
+      "listItems": 0,
+      "condition": {
+        "functionBody": "return model.deviceDiscovery === true && model.autoAddDiscoveredDevices === true;"
+      }
     },
     {
       "type": "fieldset",

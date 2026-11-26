@@ -105,6 +105,21 @@ describe("translated config schemas (Homebridge UI)", () => {
   }
 });
 
+describe("device discovery options", () => {
+  it("discovery is off by default, auto-add and excluded devices are only shown with discovery", () => {
+    assert.equal(schema.schema.properties.deviceDiscovery.default, false);
+    assert.equal(schema.schema.properties.autoAddDiscoveredDevices.default, false);
+    const layoutItem = (key) => schema.layout.find((item) => item.key === key);
+    const shown = (key, model) => new Function("model", layoutItem(key).condition.functionBody)(model);
+    assert.equal(shown("autoAddDiscoveredDevices", { deviceDiscovery: false }), false);
+    assert.equal(shown("autoAddDiscoveredDevices", {}), false);
+    assert.equal(shown("autoAddDiscoveredDevices", { deviceDiscovery: true }), true);
+    assert.equal(shown("excludedSerialNumbers", { deviceDiscovery: true }), false);
+    assert.equal(shown("excludedSerialNumbers", { deviceDiscovery: false, autoAddDiscoveredDevices: true }), false);
+    assert.equal(shown("excludedSerialNumbers", { deviceDiscovery: true, autoAddDiscoveredDevices: true }), true);
+  });
+});
+
 describe("settings form layout", () => {
   // with a layout, the Homebridge UI only shows the fields listed in it
   const schemaKeys = (node, prefix, result = []) => {
