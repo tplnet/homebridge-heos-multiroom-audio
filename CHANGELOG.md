@@ -2,6 +2,22 @@
 
 All notable changes of this project.
 
+## 2.2.0 (2026-11-27)
+
+Combines 2.2.0-beta.1 and 2.2.0-beta.2.
+
+### Added
+
+- **Device overview in the plugin settings:** *Plugin Config* has a second tab, *Devices in the network* (the settings form stays on the first tab, *Settings*). Opening the tab searches the network once (about 10 seconds, also with *Device Discovery* off) and lists every device with IP address, serial number, control protocol and status (added automatically, set up manually, excluded, not added, not reachable). **Edit** takes an automatically added device into *Devices (manual setup)* on the *Settings* tab, where its settings – e.g. the control protocol – can be changed; it stays paired in the Home app. **Exclude** / **Include again** maintain *Excluded Devices*, **Set up** adds a found device manually. Nothing is changed before *Save*. English and German. See [Device overview](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#device-overview-in-the-plugin-settings).
+- Technical: custom settings page of the Homebridge UI (`customUi`, `homebridge-ui/`, new dependency `@homebridge/plugin-ui-utils`); the search uses the discovery and protocol check of the plugin.
+
+### Changed
+
+- **Settings form: *Device Discovery* is off by default.** Manually configured devices (*Devices*) work without it. Existing configurations keep their setting.
+- Settings form: *Add Discovered Devices Automatically* is only shown while *Device Discovery* is on, and *Excluded Devices* only while both are on – adding devices automatically needs the discovery. Note: when you switch off *Device Discovery* and save, the Homebridge UI removes these two settings from the configuration, including the list of excluded devices.
+- `"deviceDiscovery": false` now also switches off `autoAddDiscoveredDevices` (before, auto-add started the discovery anyway); the log warns about this combination. A configuration without a `deviceDiscovery` entry and with `autoAddDiscoveredDevices` keeps the discovery, as before.
+- The hint for the serial number of a device names the type label of the device and the device overview of the discovery.
+
 ## 2.2.0-beta.2 (2026-11-27)
 
 ### Added
