@@ -93,6 +93,15 @@ Running it on a [child bridge](https://github.com/homebridge/homebridge/wiki/Chi
 
 The plugin settings (*Plugins* → ⋮ → *Plugin Config*) have a second tab, **Devices in the network**: it lists the devices found in the network, and each automatically added device can be taken into the manual setup with **Edit** – e.g. to change its control protocol – or excluded.
 
+<details>
+<summary>Screenshots of the plugin settings</summary>
+
+<img src="https://raw.githubusercontent.com/tplnet/homebridge-heos-multiroom-audio/main/docs/images/settings-form.png" width="600" alt="Plugin settings, tab Settings: name, Device Discovery, Add Discovered Devices Automatically, Excluded Devices, Devices (manual setup)">
+
+<img src="https://raw.githubusercontent.com/tplnet/homebridge-heos-multiroom-audio/main/docs/images/settings-devices.png" width="600" alt="Plugin settings, tab Devices in the network: example devices with IP address, serial number, protocol, status and the buttons Edit, Exclude and Include again">
+
+</details>
+
 Devices you want to set up yourself (name, protocol, inputs, volume limit) are added under **Devices** in the settings form; they always keep their manual settings and also work with Device Discovery switched off. All options: [Configuration](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md).
 
 ## Compatibility and security
