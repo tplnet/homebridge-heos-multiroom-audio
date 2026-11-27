@@ -2,6 +2,13 @@
 
 All notable changes of this project.
 
+## 2.2.0-beta.2 (2026-11-27)
+
+### Added
+
+- **Device overview in the plugin settings:** *Plugin Config* has a second tab, *Devices in the network* (the settings form stays on the first tab, *Settings*). Opening the tab searches the network once (about 10 seconds, also with *Device Discovery* off) and lists every device with IP address, serial number, control protocol and status (added automatically, set up manually, excluded, not added, not reachable). **Edit** takes an automatically added device into *Devices (manual setup)* on the *Settings* tab, where its settings – e.g. the control protocol – can be changed; it stays paired in the Home app. **Exclude** / **Include again** maintain *Excluded Devices*, **Set up** adds a found device manually. Nothing is changed before *Save*. English and German. See [Device overview](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md#device-overview-in-the-plugin-settings).
+- Technical: custom settings page of the Homebridge UI (`customUi`, `homebridge-ui/`, new dependency `@homebridge/plugin-ui-utils`); the search uses the discovery and protocol check of the plugin.
+
 ## 2.2.0-beta.1 (2026-11-26)
 
 ### Changed

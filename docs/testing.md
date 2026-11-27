@@ -44,6 +44,16 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 - [x] `"deviceDiscovery": false` with `"autoAddDiscoveredDevices": true`: warning in the log, no device is added automatically (2.2.0-beta.1).
 - [x] Switching off Device Discovery in the settings form and saving removes *Add Discovered Devices Automatically* and *Excluded Devices* from the configuration (expected, documented; 2.2.0-beta.1).
 
+## Settings page (device overview)
+
+- [ ] *Plugin Config* opens on the *Settings* tab (form as before, no search). Opening *Devices in the network* starts the search; the list fills within about 10 seconds with every device (name, model, IP address, serial number, protocol, status).
+- [ ] Statuses match the device overview in the Homebridge log (added automatically, set up manually, excluded, not added).
+- [ ] **Edit** on an automatically added device: switches to *Settings*, entry under *Devices (manual setup)* with name, serial number, IP and protocol; after changing the protocol and saving, the device uses the new protocol and stays paired in the Home app.
+- [ ] **Exclude** / **Include again** change *Excluded Devices*; after saving, the device is no longer added / added again.
+- [ ] Fresh installation: found devices show *not added* and **Set up**; saving works without "Config Validation Failed".
+- [ ] German UI language: overview in German; **Search again** repeats the search.
+- [ ] Homebridge UI log: no errors of the settings page (`[@tplnet/homebridge-heos-multiroom-audio]`).
+
 ## 2. Automatic setup
 
 - [x] With `autoAddDiscoveredDevices` enabled, every discovered device is added with its HEOS name (log: `Automatically adding discovered device …`).

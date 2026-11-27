@@ -1,6 +1,7 @@
 {
   "pluginAlias": "HeosMultiroomAudio",
   "pluginType": "platform",
+  "customUi": true,
   "singular": true,
   "strictValidation": true,
   "schema": {

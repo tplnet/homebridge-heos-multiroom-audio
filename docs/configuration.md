@@ -65,6 +65,22 @@ There are two ways to set up your devices. You can combine them.
 **Rule of thumb:** use automatic setup for simple speakers and add AV receivers or amplifiers whose inputs you want to switch manually.
 Devices that you configure manually are **never** touched by the automatic setup, even if they are discovered.
 
+### Device overview in the plugin settings
+
+The plugin settings (*Plugins* → ⋮ → *Plugin Config*) have two tabs: **Settings** (the settings form, opened first) and **Devices in the network**. When you open the devices tab, it searches the network once for about 10 seconds – also with *Device Discovery* off – and lists every device with its IP address, serial number, control protocol and status. The list fills while the search runs; *Search again* repeats it.
+
+| Status | Meaning | Buttons |
+| --- | --- | --- |
+| *added automatically* | found, added by *Add Discovered Devices Automatically* | **Edit**, **Exclude** |
+| *set up manually* | entry under *Devices (manual setup)* (with *not found in the network* if the search didn't find it) | – (change it in the form) |
+| *excluded* | listed under *Excluded Devices* | **Include again**, **Edit** |
+| *not added* | found, but adding automatically is off | **Set up** |
+| *not reachable* | answered the search, but neither HEOS CLI nor AVR Control is reachable | – |
+
+- **Edit** / **Set up** takes the device into *Devices (manual setup)* with its name, serial number, IP address and control protocol and switches to the *Settings* tab. Open the section, change the settings there (e.g. the control protocol) and click **Save**. The device keeps its pairing in the Home app (it is identified by the serial number). Inputs are still read from the device unless you add your own list.
+- **Exclude** / **Include again** change the *Excluded Devices* list.
+- Nothing is changed before you click **Save**.
+
 ### Step 1: Find your devices
 
 In the plugin settings, enable **Device Discovery** (off by default) and restart Homebridge. About 30 seconds after the start, the log shows an **overview of all devices** – the ones found in the network and the manually configured ones – and whether they were added:
@@ -104,7 +120,7 @@ Discovery keeps running in the background and searches for HEOS devices every 2 
 
 ### Step 3b: Manual setup
 
-Use the settings form in the Homebridge UI, or edit `config.json`:
+Use **Set up** or **Edit** in the [device overview](#device-overview-in-the-plugin-settings), the settings form in the Homebridge UI, or edit `config.json`:
 
 ```json
 {
@@ -206,7 +222,7 @@ The settings form in the Homebridge UI is available in these languages:
 | English (default) | `config.schema.json` |
 | German (Deutsch) | `schemas/config.schema.de.json` |
 
-The Homebridge UI shows the German form when its language is set to **Deutsch** (*Settings* → UI language). With the language set to *Automatic* (auto) and in Homebridge UI versions before 5.15, the English form is shown. Log messages and the documentation are in English.
+The Homebridge UI shows the German form (and the device overview in German) when its language is set to **Deutsch** (*Settings* → UI language). With the language set to *Automatic* (auto) and in Homebridge UI versions before 5.15, the English form is shown. Log messages and the documentation are in English.
 
 ## Beta versions
 

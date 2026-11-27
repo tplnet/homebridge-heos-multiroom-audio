@@ -91,6 +91,8 @@ Running it on a [child bridge](https://github.com/homebridge/homebridge/wiki/Chi
 2. Give the devices a fixed IP address in your router (DHCP reservation).
 3. Add each device to the Home app once: **+** → **Add Accessory** → **More options…** → choose the device → enter the setup code from the log – see [Apple Home](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/apple-home.md).
 
+The plugin settings (*Plugins* → ⋮ → *Plugin Config*) have a second tab, **Devices in the network**: it lists the devices found in the network, and each automatically added device can be taken into the manual setup with **Edit** – e.g. to change its control protocol – or excluded.
+
 Devices you want to set up yourself (name, protocol, inputs, volume limit) are added under **Devices** in the settings form; they always keep their manual settings and also work with Device Discovery switched off. All options: [Configuration](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/configuration.md).
 
 ## Compatibility and security
@@ -115,13 +117,14 @@ It only talks to your HEOS devices in the local network:
 
 | Connection | Target | Purpose |
 | --- | --- | --- |
-| SSDP search (UDP 1900, multicast) | local network | find HEOS devices (automatic setup) |
+| SSDP search (UDP 1900, multicast) | local network | find HEOS devices (automatic setup, and when the tab *Devices in the network* of the plugin settings is opened) |
 | HTTP (device description, port 60006) | the device itself | name, model, serial number, firmware |
 | TCP 1255 (HEOS CLI) / TCP 23 (AVR Control) | the device itself | control: power, volume, mute, inputs, play/pause |
 
 - Device descriptions are only fetched from the device that answered the search, never from another address it names.
 - The plugin writes no files of its own. Device names, IP addresses and serial numbers are kept only in your Homebridge configuration and the local Homebridge log.
-- The runtime dependencies (`@xmldom/xmldom`, `async-mutex`, `date-fns`) have no network access.
+- The tab *Devices in the network* of the plugin settings searches the network only when you open it; it uses the same search and checks as the plugin.
+- The runtime dependencies (`@homebridge/plugin-ui-utils`, `@xmldom/xmldom`, `async-mutex`, `date-fns`) have no network access (`@homebridge/plugin-ui-utils` only connects the settings page to the Homebridge UI).
 - Only Homebridge itself and the Homebridge UI go online (e.g. to check npm for plugin updates); the plugin doesn't.
 
 ## Documentation

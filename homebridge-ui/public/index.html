@@ -1,0 +1,220 @@
+<style>
+  #heos-overview .table td,
+  #heos-overview .table th {
+    vertical-align: middle;
+  }
+  #heos-overview .table td:first-child {
+    min-width: 9rem;
+  }
+  #heos-overview .table td.actions div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  #heos-overview .table .sub {
+    display: block;
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
+</style>
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button id="heos-tab-settings" class="nav-link active" type="button" role="tab" data-text="tabSettings"></button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button id="heos-tab-devices" class="nav-link" type="button" role="tab" data-text="title"></button>
+  </li>
+</ul>
+
+<div id="heos-overview" class="card mb-3 d-none">
+  <div class="card-body">
+    <div class="d-flex align-items-center mb-2">
+      <span class="me-auto"></span>
+      <span id="heos-searching" class="text-muted small me-2 d-none">
+        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        <span data-text="searching"></span>
+      </span>
+      <button id="heos-rescan" type="button" class="btn btn-sm btn-outline-primary" data-text="rescan" disabled></button>
+    </div>
+    <p class="small text-muted" data-text="intro"></p>
+    <div id="heos-error" class="alert alert-warning small d-none" role="alert"></div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead>
+          <tr>
+            <th data-text="colDevice"></th>
+            <th data-text="colAddress"></th>
+            <th data-text="colProtocol"></th>
+            <th data-text="colStatus"></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="heos-rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { PLATFORM, DEFAULT_NAME, buildRows, addManualEntry, setExcluded, texts, format } from "./overview.js";
+
+  const t = texts(await homebridge.i18nCurrentLang());
+  document.querySelectorAll("[data-text]").forEach((element) => (element.textContent = t[element.dataset.text]));
+
+  const rowsElement = document.getElementById("heos-rows");
+  const searchingElement = document.getElementById("heos-searching");
+  const rescanButton = document.getElementById("heos-rescan");
+  const errorElement = document.getElementById("heos-error");
+
+  let pluginConfig = await homebridge.getPluginConfig();
+  let discovered = [];
+  let scanId = 0;
+  let scanFinished = false;
+  let scanStarted = false;
+  const settingsTab = document.getElementById("heos-tab-settings");
+  const devicesTab = document.getElementById("heos-tab-devices");
+  const overviewElement = document.getElementById("heos-overview");
+
+  /** Settings tab: the schema form. Devices tab: the overview; the search starts when it is opened the first time. */
+  function showTab(tab) {
+    const devices = tab === "devices";
+    settingsTab.classList.toggle("active", !devices);
+    devicesTab.classList.toggle("active", devices);
+    overviewElement.classList.toggle("d-none", !devices);
+    if (devices) {
+      homebridge.hideSchemaForm();
+      render();
+      if (!scanStarted) {
+        scan();
+      }
+    } else {
+      // shown again, the schema form picks up changes made on the devices tab
+      homebridge.showSchemaForm();
+    }
+  }
+
+  const platformConfig = () => pluginConfig[0] ?? { platform: PLATFORM, name: DEFAULT_NAME };
+
+  async function updateConfig(config) {
+    pluginConfig = [config, ...pluginConfig.slice(1)];
+    await homebridge.updatePluginConfig(pluginConfig);
+    render();
+  }
+
+  function cell(text, sub) {
+    const td = document.createElement("td");
+    td.textContent = text ?? "";
+    if (sub) {
+      const span = document.createElement("span");
+      span.className = "sub";
+      span.textContent = sub;
+      td.append(span);
+    }
+    return td;
+  }
+
+  function render() {
+    const rows = buildRows(platformConfig(), discovered, scanFinished);
+    rowsElement.replaceChildren();
+    if (rows.length === 0) {
+      const tr = document.createElement("tr");
+      const td = cell(scanFinished ? t.noDevices : "");
+      td.className = "text-muted";
+      td.colSpan = 5;
+      tr.append(td);
+      rowsElement.append(tr);
+      return;
+    }
+    for (const row of rows) {
+      const tr = document.createElement("tr");
+      tr.append(
+        cell(row.name, row.modelName),
+        cell(row.ip, row.serialNumber),
+        cell(row.controlProtocol),
+        cell(t[`status_${row.status}`]),
+      );
+      const actions = document.createElement("div");
+      for (const action of row.actions) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = action === "edit" || action === "setup" ? "btn btn-sm btn-primary" : "btn btn-sm btn-outline-secondary";
+        button.textContent = t[`action_${action}`];
+        button.addEventListener("click", () => runAction(action, row));
+        actions.append(button);
+      }
+      const actionsCell = document.createElement("td");
+      actionsCell.className = "actions";
+      actionsCell.append(actions);
+      tr.append(actionsCell);
+      rowsElement.append(tr);
+    }
+  }
+
+  async function runAction(action, row) {
+    const config = platformConfig();
+    if (action === "edit" || action === "setup") {
+      await updateConfig(addManualEntry(config, row));
+      showTab("settings");
+      homebridge.toast.success(format(t.toastEdit, row));
+    } else if (action === "exclude") {
+      await updateConfig(setExcluded(config, row.serialNumber, true));
+      homebridge.toast.info(format(t.toastExclude, row));
+    } else if (action === "include") {
+      await updateConfig(setExcluded(config, row.serialNumber, false));
+      homebridge.toast.info(format(t.toastInclude, row));
+    }
+  }
+
+  async function scan() {
+    scanStarted = true;
+    discovered = [];
+    scanFinished = false;
+    rescanButton.disabled = true;
+    searchingElement.classList.remove("d-none");
+    errorElement.classList.add("d-none");
+    render();
+    try {
+      scanId = Date.now();
+      await homebridge.request("/scan", { scanId });
+    } catch (error) {
+      scanDone({ error: error.message ?? String(error) });
+    }
+  }
+
+  function scanDone({ error }) {
+    scanFinished = true;
+    rescanButton.disabled = false;
+    searchingElement.classList.add("d-none");
+    if (error) {
+      errorElement.textContent = format(t.searchFailed, { error });
+      errorElement.classList.remove("d-none");
+    }
+    render();
+  }
+
+  homebridge.addEventListener("device", ({ data }) => {
+    if (data.scanId === scanId && !discovered.some((device) => device.serialNumber === data.serialNumber)) {
+      discovered.push(data);
+      render();
+    }
+  });
+  homebridge.addEventListener("scan-done", ({ data }) => {
+    if (data.scanId === scanId) {
+      scanDone(data);
+    }
+  });
+  homebridge.addEventListener("configChanged", ({ data }) => {
+    pluginConfig = data;
+    render();
+  });
+  rescanButton.addEventListener("click", scan);
+  settingsTab.addEventListener("click", () => showTab("settings"));
+  devicesTab.addEventListener("click", () => showTab("devices"));
+
+  if (pluginConfig.length === 0) {
+    // not configured yet: start with the defaults, like the schema form does
+    await updateConfig({ platform: PLATFORM, name: DEFAULT_NAME });
+  }
+  showTab("settings");
+</script>
