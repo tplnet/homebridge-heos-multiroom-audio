@@ -46,13 +46,13 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 
 ## Settings page (device overview)
 
-- [ ] *Plugin Config* opens on the *Settings* tab (form as before, no search). Opening *Devices in the network* starts the search; the list fills within about 10 seconds with every device (name, model, IP address, serial number, protocol, status).
-- [ ] Statuses match the device overview in the Homebridge log (added automatically, set up manually, excluded, not added).
-- [ ] **Edit** on an automatically added device: switches to *Settings*, entry under *Devices (manual setup)* with name, serial number, IP and protocol; after changing the protocol and saving, the device uses the new protocol and stays paired in the Home app.
-- [ ] **Exclude** / **Include again** change *Excluded Devices*; after saving, the device is no longer added / added again.
-- [ ] Fresh installation: found devices show *not added* and **Set up**; saving works without "Config Validation Failed".
-- [ ] German UI language: overview in German; **Search again** repeats the search.
-- [ ] Homebridge UI log: no errors of the settings page (`[@tplnet/homebridge-heos-multiroom-audio]`).
+- [x] *Plugin Config* opens on the *Settings* tab (form as before, no search). Opening *Devices in the network* starts the search; the list fills within about 10 seconds with every device (name, model, IP address, serial number, protocol, status) (2.2.0-beta.2).
+- [x] Statuses match the device overview in the Homebridge log (added automatically, set up manually, excluded, not added) (2.2.0-beta.2).
+- [x] **Edit** on an automatically added device: switches to *Settings*, entry under *Devices (manual setup)* with name, serial number, IP and protocol; after changing the protocol and saving, the device uses the new protocol and stays paired in the Home app (2.2.0-beta.2).
+- [x] **Exclude** / **Include again** change *Excluded Devices*; after saving, the device is no longer added / added again (2.2.0-beta.2).
+- [x] Fresh installation: found devices show *not added* and **Set up**; saving works without "Config Validation Failed" (2.2.0-beta.2).
+- [x] German UI language: overview in German; **Search again** repeats the search (2.2.0-beta.2).
+- [x] Homebridge UI log: no errors of the settings page (`[@tplnet/homebridge-heos-multiroom-audio]`) (2.2.0-beta.2).
 
 ## 2. Automatic setup
 
