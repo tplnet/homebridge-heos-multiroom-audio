@@ -67,7 +67,7 @@ Run Homebridge with debug logging (`homebridge -D` or `npm run watch`) and keep 
 - [x] All configured devices start without errors.
 - [x] Manufacturer, model and firmware version are shown in the accessory details in the Home app (Cinema 60, 1.5.1-beta.5).
 - [x] A device configured with a protocol it doesn't support (e.g. `AVRCONTROL` on a Denon Home 150) starts with the supported protocol and a warning in the log asks to change *Control Protocol*; the other devices still work (2.2.0).
-- [ ] A device with an unknown `controlProtocol` value (only possible in `config.json`) is reported in the log and skipped, and the other devices still work.
+- [x] A device with an unknown `controlProtocol` value is reported in the log and skipped. The settings form and the plugin's JSON Config only allow the known values, so this is covered by the unit test `test/unit/unknownProtocol.test.js` instead of a manual test.
 - [x] Homebridge starts while one device is unplugged, and that device shows *No Response*; the other devices start normally and keep their ports; after plugging it in the device works again without restart (Denon Home 150, 2.0.1-beta.2). 2.0.1-beta.3: one warning instead of an error at every query (only when the Home app queries the device); after plugging it in the inputs are read without restart (✅ Denon Home 150, 2.0.1-beta.6).
 
 ## 4. Controls (per device)
