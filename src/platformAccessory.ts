@@ -18,6 +18,8 @@ import { fromDeviceVolume, toDeviceVolume } from "./volumeLimit.js";
  */
 export class DenonAudioAccessory {
   private static readonly CALLBACK_TIMEOUT = 1500;
+  /** Commands the device refuses within this time after a logged refusal are summarized in one line. */
+  static REFUSAL_SUMMARY_WINDOW = 10_000;
   private static readonly API_CONNECT_TIMEOUT = 5 * 1000;
   private static readonly API_RESPONSE_TIMEOUT = 1 * 1000;
   private static readonly DEFAULT_VOLUME_STEP_SIZE = 2;
@@ -367,6 +369,37 @@ export class DenonAudioAccessory {
     );
   }
 
+  private refusalWindowOpen = false;
+  private refusalsInWindow = 0;
+
+  /**
+   * Logs a failed command. A command the device refused (e.g. "Processing previous command" while it is busy) gets one
+   * short warning with the reason the device gave; further refusals in the next seconds are summarized in one line.
+   * Other errors are logged as errors, as before.
+   */
+  private logCommandError(action: string, error: unknown) {
+    if (!(error instanceof CommandFailedException)) {
+      this.log.error(`An error occurred while ${action}.`, error);
+      return;
+    }
+    if (this.refusalWindowOpen) {
+      this.refusalsInWindow++;
+      this.log.debug(`The device refused ${action} (${error.reason}).`);
+      return;
+    }
+    this.log.warn(`The device refused ${action} (${error.reason}).`);
+    this.refusalWindowOpen = true;
+    this.refusalsInWindow = 0;
+    const timer = setTimeout(() => {
+      this.refusalWindowOpen = false;
+      if (this.refusalsInWindow > 0) {
+        const count = this.refusalsInWindow;
+        this.log.warn(`The device refused ${count} more command${count === 1 ? "" : "s"} right after that (details in the debug log).`);
+      }
+    }, DenonAudioAccessory.REFUSAL_SUMMARY_WINDOW);
+    timer.unref?.();
+  }
+
   private markUnreachable(error: Error, context: string) {
     if (!this.unreachable) {
       this.unreachable = true;
@@ -557,7 +590,8 @@ export class DenonAudioAccessory {
       } else if (error instanceof ResponseTimeoutException) {
         this.log.debug(`Response timed out for ${operation}(). [race id: ${raceStatus.raceId}]`, error);
       } else {
-        this.log.error(`An error occurred while getting ${description}. [race id: ${raceStatus.raceId}]`, error);
+        this.log.debug(`${operation}() failed. [race id: ${raceStatus.raceId}]`);
+        this.logCommandError(`getting ${description}`, error);
       }
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
@@ -589,7 +623,7 @@ export class DenonAudioAccessory {
       })
       .catch(async (error) => {
         this.pendingActive = undefined;
-        this.log.error(`An error occurred while setting power status.`, error);
+        this.logCommandError("setting power status", error);
         // show the real state again
         const deviceState = await this.denonClient.getPower().catch(() => !active);
         this.tvService.updateCharacteristic(this.platform.Characteristic.Active, deviceState);
@@ -610,7 +644,7 @@ export class DenonAudioAccessory {
     try {
       await this.denonClient.setInput(this.configuredInputsByIdentifier.get(newValue as number)!.inputID);
     } catch (error) {
-      this.log.error(`An error occurred while setting input.`, error);
+      this.logCommandError("setting input", error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
@@ -700,7 +734,7 @@ export class DenonAudioAccessory {
       this.targetMediaState = target;
       await this.denonClient.setPlaying(target);
     } catch (error) {
-      this.log.error(`An error occurred while setting the play state.`, error);
+      this.logCommandError("setting the play state", error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
       this.targetMediaState = undefined;
@@ -731,7 +765,7 @@ export class DenonAudioAccessory {
       }
       await this.denonClient.setPlaying(this.targetMediaState);
     } catch (error) {
-      this.log.error(`An error occurred while toggling play/pause.`, error);
+      this.logCommandError("toggling play/pause", error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
       this.targetMediaState = undefined;
@@ -749,7 +783,7 @@ export class DenonAudioAccessory {
         this.log.info(`The current source doesn't support skipping to the next track (e.g. a radio station or an input).`);
         return;
       }
-      this.log.error(`An error occurred while setting play next.`, error);
+      this.logCommandError("setting play next", error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
@@ -764,7 +798,7 @@ export class DenonAudioAccessory {
         this.log.info(`The current source doesn't support skipping to the previous track (e.g. a radio station or an input).`);
         return;
       }
-      this.log.error(`An error occurred while setting play previous.`, error);
+      this.logCommandError("setting play previous", error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
@@ -774,7 +808,7 @@ export class DenonAudioAccessory {
     try {
       await this.denonClient.setMute(newValue as boolean);
     } catch (error) {
-      this.log.error(`An error occurred while setting mute status.`, error);
+      this.logCommandError("setting mute status", error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
@@ -791,7 +825,7 @@ export class DenonAudioAccessory {
       this.lastSetVolume = newValue as number;
       await this.denonClient.setVolume(toDeviceVolume(newValue as number, this.volumeLimit));
     } catch (error) {
-      this.log.error(`An error occurred while setting volume.`, error);
+      this.logCommandError("setting volume", error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
       this.volumeChangeOngoing = false;
@@ -821,7 +855,7 @@ export class DenonAudioAccessory {
         await this.denonClient.setVolumeDown(this.volumeStepSize);
       }
     } catch (error) {
-      this.log.error(`An error occurred while changing the volume.`, error);
+      this.logCommandError("changing the volume", error);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     } finally {
       this.volumeChangeOngoing = false;

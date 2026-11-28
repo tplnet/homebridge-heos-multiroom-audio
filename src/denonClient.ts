@@ -476,12 +476,29 @@ export class ResponseTimeoutException extends Error {
 }
 
 export class CommandFailedException extends Error {
-  constructor(command: string) {
-    super(`Execution of command "${command}" has failed on the server side.`); // Pass the message to the parent Error class
+  /** Error id reported by the device (HEOS CLI: eid), if any. */
+  public readonly errorId?: number;
+  /** Error text reported by the device (HEOS CLI: text), if any. */
+  public readonly errorText?: string;
+
+  constructor(command: string, errorId?: number, errorText?: string) {
+    const details = CommandFailedException.formatReason(errorId, errorText);
+    super(`Execution of command "${command}" has failed on the server side${details ? ` (${details})` : ""}.`); // Pass the message to the parent Error class
     this.name = "CommandFailedException"; // Set the error name
+    this.errorId = errorId;
+    this.errorText = errorText;
 
     // Ensure the prototype chain is correctly set for instanceof checks
     Object.setPrototypeOf(this, CommandFailedException.prototype);
+  }
+
+  /** Short reason for the log, e.g. "eid=13: Processing previous command". */
+  get reason(): string {
+    return CommandFailedException.formatReason(this.errorId, this.errorText) || "no reason given by the device";
+  }
+
+  private static formatReason(errorId?: number, errorText?: string): string {
+    return [errorId !== undefined ? `eid=${errorId}` : undefined, errorText].filter(Boolean).join(": ");
   }
 }
 

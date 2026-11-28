@@ -54,7 +54,7 @@ describe("HEOS power on", () => {
           reply =
             setPlay === "success"
               ? { heos: { command: name, result: "success", message: `pid=${PID}&state=${command.match(/state=(\w+)/)[1]}` } }
-              : { heos: { command: name, result: "fail", message: "eid=2&text=Invalid ID" } };
+              : { heos: { command: name, result: "fail", message: "eid=7&text=Command could not be executed" } };
         } else if (name === "browse/play_preset") {
           reply = { heos: { command: name, result: "success", message: `pid=${PID}&preset=${command.match(/preset=(\d+)/)[1]}` } };
         }

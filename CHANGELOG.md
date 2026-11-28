@@ -2,6 +2,16 @@
 
 All notable changes of this project.
 
+## 2.2.1-beta.1 (2026-11-28)
+
+### Changed
+
+- **Log: a command the device refuses is one warning with the reason the device gave**, e.g. `The device refused getting volume (eid=13: Processing previous command).`, instead of an error with a stack trace per command. Further refusals in the next 10 seconds are summarized in one line (`The device refused 5 more commands right after that`), the details are in the debug log. Other errors are logged as before. See [Troubleshooting](https://github.com/tplnet/homebridge-heos-multiroom-audio/blob/main/docs/troubleshooting.md).
+
+### Fixed
+
+- HEOS CLI: if the device answers *eid=2: ID Not Valid* (its HEOS player id changed, e.g. after a restart or firmware update of the device), the plugin looks up the player id again and repeats the command once, instead of failing until the next Homebridge restart.
+
 ## 2.2.0 (2026-11-27)
 
 Combines 2.2.0-beta.1 and 2.2.0-beta.2.

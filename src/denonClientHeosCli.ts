@@ -397,6 +397,24 @@ export class DenonClientHeosCli extends DenonClient {
     }
   }
 
+  /** HEOS CLI error id "Invalid ID": e.g. the player id changed (new player list after a restart or firmware update). */
+  static readonly ERROR_INVALID_ID = 2;
+
+  /** Reads error id and text of a failure message ("eid=13&text=Processing previous command&pid=..."). */
+  static parseError(message: string | undefined): { errorId?: number; errorText?: string } {
+    const eid = message?.match(/(?:^|&)eid=(\d+)/);
+    const text = message?.match(/(?:^|&)text=([^&]*)/);
+    let errorText = text?.[1];
+    if (errorText !== undefined) {
+      try {
+        errorText = decodeURIComponent(errorText.replace(/\+/g, " "));
+      } catch {
+        // keep the raw text
+      }
+    }
+    return { errorId: eid ? Number(eid[1]) : undefined, errorText: errorText || undefined };
+  }
+
   protected async sendCommand(
     command: ProtocolCommand,
     commandMode: CommandMode,
@@ -405,7 +423,26 @@ export class DenonClientHeosCli extends DenonClient {
     if (this.player_id === undefined) {
       await this.findPlayerId();
     }
-    return super.sendCommand(command, commandMode, { pid: this.player_id, value: value, passPayload: passPayload });
+    try {
+      return await super.sendCommand(command, commandMode, { pid: this.player_id, value: value, passPayload: passPayload });
+    } catch (error) {
+      if (!(error instanceof CommandFailedException) || error.errorId !== DenonClientHeosCli.ERROR_INVALID_ID) {
+        throw error;
+      }
+      // the player id may no longer be valid: look it up again and repeat the command once if it changed
+      const oldId = this.player_id;
+      try {
+        await this.findPlayerId();
+      } catch (lookupError) {
+        this.debugLog("Looking up the player id again failed:", lookupError instanceof Error ? lookupError.message : lookupError);
+        throw error;
+      }
+      if (this.player_id === oldId) {
+        throw error;
+      }
+      this.infoLog(`The HEOS player id changed (${oldId} → ${this.player_id}). Repeating the command.`);
+      return super.sendCommand(command, commandMode, { pid: this.player_id, value: value, passPayload: passPayload });
+    }
   }
 
   protected responseRouter(response: string) {
@@ -430,7 +467,8 @@ export class DenonClientHeosCli extends DenonClient {
     const result = r_obj.heos.result ?? r_obj.heos.success;
     if (result !== undefined && result !== "success") {
       this.debugLog("Received failure response:", response);
-      this.rejectPendingResponse(new CommandFailedException(pending.command));
+      const { errorId, errorText } = DenonClientHeosCli.parseError(r_obj.heos.message);
+      this.rejectPendingResponse(new CommandFailedException(pending.command, errorId, errorText));
       return;
     }
 
