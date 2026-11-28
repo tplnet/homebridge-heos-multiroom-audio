@@ -114,7 +114,7 @@ Note: HEOS player ids can be negative (Dining Room, Garage, Kids Room). Control 
 
 - [x] Unplug a device for a minute and plug it back in. It becomes responsive again without restarting Homebridge (Denon Home 150, 1.5.1-beta.5).
 - [ ] Restart the router / Wi-Fi. All devices reconnect.
-- [ ] Rapidly press the volume buttons of the remote and play/pause several times. Homebridge must not crash.
+- [x] Rapidly press the volume buttons of the remote and play/pause several times. Homebridge must not crash (checked in everyday use, 2.2.0).
 - [x] Control the same device from the HEOS app while the Home app is open. States stay in sync (Home 150 / 250: start / stop, 1.5.1-beta.5).
 - [x] Leave Homebridge running for 24 h and check the log for errors or warnings (1.5.1, 2026-11-19 to 2026-11-23: no errors or warnings).
 - [ ] Device discovery is still running after 24 h (no `Device discovery stopped` without a following restart). With `autoAddDiscoveredDevices`, a speaker switched on hours after the Homebridge start is added.
