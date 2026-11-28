@@ -121,7 +121,7 @@ Note: HEOS player ids can be negative (Dining Room, Garage, Kids Room). Control 
 
 ## 6. Adding to the Home app
 
-- [ ] Every device can be added with **+ → Add Accessory → More options…** and the setup code from the log.
+- [x] Every device can be added with **+ → Add Accessory → More options…** and the setup code from the log (2.2.0).
 - [x] The pairing survives a Homebridge restart and a plugin update.
 - [x] Every device keeps its port across restarts (1.3.2: ports sorted by serial number; checked again with 1.5.1 after a full Homebridge restart).
 
